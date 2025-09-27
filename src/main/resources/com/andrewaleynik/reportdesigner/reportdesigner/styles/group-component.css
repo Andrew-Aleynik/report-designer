@@ -1,0 +1,95 @@
+.collapsible-container {
+    -fx-spacing: -10px;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #888888;
+}
+
+/* Контейнер заголовка */
+.title-container {
+    -fx-alignment: center-left;
+    -fx-padding: 0 0 5px 10px;
+}
+
+/* Заголовок элемента */
+.title-label {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #888888;
+    -fx-border-width: 1px;
+    -fx-padding: 2px 8px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111111;
+}
+
+/* Кнопка свертывания */
+.collapse-button {
+    -fx-background-color: #888888;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-min-width: 20px;
+    -fx-min-height: 20px;
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+    -fx-padding: 0;
+}
+
+.collapse-button:hover {
+    -fx-background-color: #999999;
+}
+
+.collapse-button:pressed {
+    -fx-background-color: #666666;
+}
+
+/* Панель с содержимым */
+.content-pane {
+    -fx-pref-height: 120px;
+}
+
+/* Рамка вокруг содержимого */
+.content-border {
+    -fx-fill: transparent;
+    -fx-stroke: #888888;
+    -fx-stroke-width: 1px;
+    -fx-arc-width: 0;
+    -fx-arc-height: 0;
+}
+
+/* Внутренний контент */
+.inner-content {
+    -fx-padding: 20px;
+    -fx-alignment: center;
+}
+
+/* Кнопка внутри элемента */
+.content-button {
+    -fx-background-color: #888888;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 5px;
+    -fx-pref-width: 200px;
+    -fx-pref-height: 35px;
+}
+
+.content-button:hover {
+    -fx-background-color: #999999;
+}
+
+.content-button:pressed {
+    -fx-background-color: #666666;
+}
+
+/* Состояние свернутого элемента */
+.collapsible-container.collapsed .content-pane {
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    -fx-visibility: hidden;
+}
+
+.collapsible-container.collapsed .collapse-button {
+    -fx-text: "+";
+}
