@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<TabPane xmlns="http://javafx.com/javafx"
+         xmlns:fx="http://javafx.com/fxml"
+         fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.MainController"
+         tabClosingPolicy="UNAVAILABLE">
+
+    <!-- Первая вкладка - Дерево элементов -->
+    <Tab text="Элементы">
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <!-- Панель управления -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Корневые элементы:"/>
+                <ComboBox fx:id="rootElementsComboBox" prefWidth="200"/>
+                <Button text="Добавить корневой элемент" onAction="#showAddRootElementForm"/>
+            </HBox>
+
+            <!-- Дерево элементов -->
+            <TreeView fx:id="elementsTreeView" VBox.vgrow="ALWAYS">
+            </TreeView>
+        </VBox>
+    </Tab>
+
+    <!-- Вторая вкладка (заглушка) -->
+    <Tab text="Вторая вкладка">
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <Label text="Содержимое второй вкладки будет добавлено позже"/>
+        </VBox>
+    </Tab>
+
+    <!-- Третья вкладка (заглушка) -->
+    <Tab text="Третья вкладка">
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <Label text="Содержимое третьей вкладки будет добавлено позже"/>
+        </VBox>
+    </Tab>
+
+</TabPane>

@@ -11,12 +11,12 @@
 }
 
 /* Заголовок элемента */
-.title-label {
+.title-textfield {
     -fx-background-color: #ffffff;
     -fx-border-color: #888888;
     -fx-border-width: 1px;
     -fx-padding: 2px 8px;
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-text-fill: #111111;
 }
@@ -25,7 +25,7 @@
 .collapse-button {
     -fx-background-color: #888888;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 12px;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-background-radius: 0;
     -fx-border-radius: 0;

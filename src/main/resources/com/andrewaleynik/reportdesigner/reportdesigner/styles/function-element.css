@@ -4,7 +4,6 @@
     -fx-padding: 5px 0;
 }
 
-/* Стилизация чекбокса */
 .custom-checkbox {
     -fx-font-size: 14px;
 }
@@ -48,9 +47,10 @@
     -fx-border-color: #666666;
 }
 
-/* Текстовая метка чекбокса */
-.checkbox-label {
+.checkbox-textarea {
     -fx-font-size: 14px;
     -fx-text-fill: #111111;
     -fx-alignment: center-left;
+    -fx-background-color: transparent;
+    -fx-border-color: #ffffff00;
 }

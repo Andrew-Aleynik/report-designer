@@ -1,19 +1,21 @@
-module com.andrewaleynik.reportdesigner.reportdesigner {
+module reportdesigner {
     requires javafx.controls;
     requires javafx.fxml;
-    requires org.apache.logging.log4j;
-    requires org.jetbrains.annotations;
+    requires org.hibernate.orm.core;
+    requires jakarta.validation;
+    requires org.hibernate.validator;
+    requires jakarta.persistence;
+    requires lombok;
+    requires java.naming;
+    requires java.sql;
+    requires java.transaction.xa;
+
+    opens com.andrewaleynik.reportdesigner.reportdesigner.models to
+            org.hibernate.orm.core,
+            org.hibernate.validator;
 
     opens com.andrewaleynik.reportdesigner.reportdesigner to javafx.fxml;
-    exports com.andrewaleynik.reportdesigner.reportdesigner;
-    exports com.andrewaleynik.reportdesigner.reportdesigner.enums;
-    opens com.andrewaleynik.reportdesigner.reportdesigner.enums to javafx.fxml;
-    exports com.andrewaleynik.reportdesigner.reportdesigner.components;
-    opens com.andrewaleynik.reportdesigner.reportdesigner.components to javafx.fxml;
-    exports com.andrewaleynik.reportdesigner.reportdesigner.controllers;
     opens com.andrewaleynik.reportdesigner.reportdesigner.controllers to javafx.fxml;
-    exports com.andrewaleynik.reportdesigner.reportdesigner.components.comboboxes;
-    opens com.andrewaleynik.reportdesigner.reportdesigner.components.comboboxes to javafx.fxml;
-    exports com.andrewaleynik.reportdesigner.reportdesigner.components.buttons;
-    opens com.andrewaleynik.reportdesigner.reportdesigner.components.buttons to javafx.fxml;
+    exports com.andrewaleynik.reportdesigner.reportdesigner;
+    exports com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 }

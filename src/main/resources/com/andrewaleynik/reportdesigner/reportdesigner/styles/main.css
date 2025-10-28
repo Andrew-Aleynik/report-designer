@@ -31,7 +31,7 @@
 .export-button {
     -fx-background-color: #888888;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-background-radius: 0;
     -fx-border-radius: 5px;
     -fx-max-width: infinity;
@@ -52,7 +52,7 @@ BorderPane > .bottom {
 
 .title-field {
     -fx-alignment: center;
-    -fx-font-size: 16px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-background-color: transparent;
     -fx-border-color: #ffffff00;
