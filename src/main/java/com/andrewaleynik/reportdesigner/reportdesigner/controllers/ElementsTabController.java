@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-public class MainController {
+public class ElementsTabController implements Controller {
     private ElementService elementService;
 
     private Element selectedParentElement;
@@ -23,7 +23,7 @@ public class MainController {
     private TreeView<Element> elementsTreeView;
 
 
-    public MainController(ElementService elementService) {
+    public ElementsTabController(ElementService elementService) {
         this.elementService = elementService;
     }
 
@@ -34,9 +34,6 @@ public class MainController {
     }
 
     private void initializeRootElementsComboBox() {
-        List<Element> rootElements = elementService.getRootElements();
-        rootElementsComboBox.getItems().addAll(rootElements);
-
         rootElementsComboBox.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Element item, boolean empty) {
@@ -81,7 +78,7 @@ public class MainController {
                     private final Button addButton = new Button("+");
 
                     {
-                        hbox.getChildren().addAll(codeLabel, separator, nameLabel, addButton);
+                        hbox.getChildren().setAll(codeLabel, separator, nameLabel, addButton);
                         separator.setStyle("-fx-text-fill: gray;");
                         addButton.setStyle("-fx-font-weight: bold; -fx-padding: 0 3;");
 
@@ -132,12 +129,10 @@ public class MainController {
     private void showAddRootElementForm() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(App.ADD_ROOT_ELEMENT_FORM_PATH));
+            loader.setControllerFactory(App.getControllerFactory());
             DialogPane dialogPane = loader.load();
-
-            ElementFormController controller = loader.getController();
-            controller.setElementService(App.getElementService());
-            controller.setElementQualityService(App.getElementQualityService());
-            controller.setMainController(this);
+            FormController controller = loader.getController();
+            controller.setParentController(this);
 
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setDialogPane(dialogPane);
@@ -147,7 +142,7 @@ public class MainController {
 
             Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
             okButton.setOnAction(event -> {
-                if(controller.handleOk()) {
+                if (controller.handleOk()) {
                     dialog.setResult(ButtonType.OK);
                     dialog.close();
                 }
@@ -172,12 +167,11 @@ public class MainController {
     private void showAddChildElementForm(Element parentElement) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(App.ADD_CHILD_ELEMENT_FORM_PATH));
+            loader.setControllerFactory(App.getControllerFactory());
             DialogPane dialogPane = loader.load();
-
             ElementFormController controller = loader.getController();
-            controller.setElementService(elementService);
-            controller.setMainController(this);
             controller.setParentElement(parentElement);
+            controller.setParentController(this);
 
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setDialogPane(dialogPane);
@@ -206,7 +200,14 @@ public class MainController {
         }
     }
 
-    public void refreshRootElementsComboBox() {
+    @Override
+    public void updateViews() {
+        List<Element> rootElements = elementService.getRootElements();
+        rootElementsComboBox.getItems().setAll(rootElements);
+        refreshRootElementsComboBox();
+    }
+
+    private void refreshRootElementsComboBox() {
         Element selected = rootElementsComboBox.getValue();
         rootElementsComboBox.getItems().clear();
         List<Element> rootElements = elementService.getRootElements();

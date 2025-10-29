@@ -1,6 +1,6 @@
 package com.andrewaleynik.reportdesigner.reportdesigner;
 
-import com.andrewaleynik.reportdesigner.reportdesigner.controllers.MainController;
+import com.andrewaleynik.reportdesigner.reportdesigner.controllers.*;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.*;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.impl.*;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementQualityService;
@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -49,17 +50,7 @@ public class App extends javafx.application.Application {
         FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource(MAIN_PATH)));
 
 
-        loader.setControllerFactory(type -> {
-            if (type == MainController.class) {
-                return new MainController(getElementService());
-            } else {
-                try {
-                    return type.getDeclaredConstructor().newInstance();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        loader.setControllerFactory(App.getControllerFactory());
 
         Parent root = loader.load();
 
@@ -83,5 +74,23 @@ public class App extends javafx.application.Application {
 
     public static ElementQualityService getElementQualityService() {
         return elementQualityService;
+    }
+
+    public static Callback<Class<?>, Object> getControllerFactory() {
+        return type -> {
+            if (type == ElementsTabController.class) {
+                return new ElementsTabController(getElementService());
+            } else if (type == ElementQualitiesTabController.class) {
+                return new ElementQualitiesTabController(getElementQualityService());
+            } else if (type == ElementFormController.class) {
+                return new ElementFormController(getElementService());
+            } else if (type == ElementQualityFormController.class) {
+                return new ElementQualityFormController(getElementQualityService());
+            } else if (type == ElementTypeFormController.class) {
+                return new ElementTypeFormController(getElementService());
+            } else {
+                throw new RuntimeException("No suitable constructor for type: " + type.getSimpleName());
+            }
+        };
     }
 }

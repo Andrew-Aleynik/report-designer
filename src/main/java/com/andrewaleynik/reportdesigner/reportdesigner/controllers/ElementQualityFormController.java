@@ -6,21 +6,21 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 
-public class ElementQualityFormController {
-    ElementFormController elementFormController;
+public class ElementQualityFormController implements FormController {
+    private Controller parentController;
 
     private ElementQualityService elementQualityService;
 
     @FXML
     private TextField codeField;
 
-
-    public void setElementFormController(ElementFormController elementFormController) {
-        this.elementFormController = elementFormController;
+    public ElementQualityFormController(ElementQualityService elementQualityService) {
+        this.elementQualityService = elementQualityService;
     }
 
-    public void setElementQualityService(ElementQualityService elementQualityService) {
-        this.elementQualityService = elementQualityService;
+    @Override
+    public void setParentController(Controller controller) {
+        this.parentController = controller;
     }
 
     public boolean handleOk() {
@@ -57,5 +57,10 @@ public class ElementQualityFormController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    @Override
+    public void updateViews() {
+        // Nothing
     }
 }

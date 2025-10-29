@@ -6,8 +6,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 
-public class ElementTypeFormController {
-    private ElementFormController elementFormController;
+public class ElementTypeFormController implements FormController {
+    private Controller parentController;
 
     private ElementService elementService;
 
@@ -16,13 +16,13 @@ public class ElementTypeFormController {
 
     private ElementType newElementType;
 
-
-    public void setElementFormController(ElementFormController elementFormController) {
-        this.elementFormController = elementFormController;
+    public ElementTypeFormController(ElementService elementService) {
+        this.elementService = elementService;
     }
 
-    public void setElementService(ElementService elementService) {
-        this.elementService = elementService;
+    @Override
+    public void setParentController(Controller controller) {
+        this.parentController = controller;
     }
 
     public boolean handleOk() {
@@ -62,5 +62,10 @@ public class ElementTypeFormController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    @Override
+    public void updateViews() {
+        // Nothing
     }
 }
