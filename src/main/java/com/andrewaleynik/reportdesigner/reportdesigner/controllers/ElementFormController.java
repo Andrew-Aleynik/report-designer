@@ -1,22 +1,25 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.App;
+import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ElementDataModel;
+import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementType;
-import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementService;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
-public class ElementFormController implements FormController {
-    private Controller parentController;
-    private ElementService elementService;
-    private Element parentElement;
+public class ElementFormController {
+    private ElementDataModel elementDataModel;
+    private QualityDataModel qualityDataModel;
 
     @FXML
     private Label parentElementLabel;
@@ -35,68 +38,64 @@ public class ElementFormController implements FormController {
 
     @FXML
     private ComboBox<ElementQuality> qualityComboBox;
+    @FXML
+    private Button okButton;
+    private boolean saved = false;
+    private Stage dialogStage;
 
-    public ElementFormController(ElementService elementService) {
-        this.elementService = elementService;
-    }
-
-    @Override
-    public void setParentController(Controller controller) {
-        this.parentController = controller;
-
-    }
-
-    @Override
-    public void updateViews() {
-        List<ElementType> elementTypes = elementService.getAllElementTypes();
-        typeComboBox.getItems().setAll(elementTypes);
-
-        List<ElementQuality> elementQualities = elementService.getAllElementQualities();
-        qualityComboBox.getItems().setAll(elementQualities);
-    }
-
-    public void setParentElement(Element parentElement) {
-        this.parentElement = parentElement;
-        if (parentElementLabel != null && parentElement != null) {
-            parentElementLabel.setText(parentElement.getCode() + " - " + parentElement.getName());
-        }
+    public ElementFormController(ElementDataModel elementDataModel, QualityDataModel qualityDataModel) {
+        this.elementDataModel = elementDataModel;
+        this.qualityDataModel = qualityDataModel;
     }
 
     @FXML
     public void initialize() {
-        setupValidation();
         initializeComboBoxes();
-        updateViews();
+        Element parentElement = elementDataModel.getSelectedParentElement();
+        if (parentElement != null) {
+            parentElementLabel.setText(parentElement.getCode() + " - " + parentElement.getName());
+        }
+
+        codeField.textProperty().addListener(propertyChangeListener());
+        typeComboBox.placeholderProperty().addListener(propertyChangeListener());
+        nameField.textProperty().addListener(propertyChangeListener());
+
+        updateOkButtonState();
     }
 
-    @Override
-    public boolean handleOk() {
-        if (validateForm()) {
-            try {
-                Element element = new Element();
-                element.setCode(codeField.getText().trim());
-                element.setType(typeComboBox.getValue());
-                element.setName(nameField.getText().trim());
-                element.setDescription(descriptionField.getText().trim());
-                element.setQuality(qualityComboBox.getValue());
+    private void updateOkButtonState() {
+        boolean isNotValid = validateForm();
+        okButton.setDisable(isNotValid);
+    }
 
-                if (parentElement != null) {
-                    parentElement.addChild(element);
-                    element.setLevel(parentElement.getLevel() + 1);
-                } else {
-                    element.setLevel(0);
-                }
+    @FXML
+    public void handleOk() {
+        boolean isValid = !validateForm();
+        if (isValid) {
+            Element element = new Element();
+            element.setCode(codeField.getText().trim());
+            element.setType(typeComboBox.getValue());
+            element.setName(nameField.getText().trim());
+            element.setDescription(descriptionField.getText().trim());
+            element.setQuality(qualityComboBox.getValue());
 
-                elementService.saveElement(element);
-
-                return true;
-
-            } catch (Exception e) {
-                showError("Ошибка сохранения", e.getMessage());
-                return false;
+            if (elementDataModel.getSelectedParentElement() != null) {
+                elementDataModel.getSelectedParentElement().addChild(element);
+                element.setLevel(elementDataModel.getSelectedParentElement().getLevel() + 1);
+            } else {
+                element.setLevel(0);
             }
+
+            elementDataModel.saveElement(element);
+            saved = true;
+            closeDialog();
         }
-        return false;
+    }
+
+    @FXML
+    public void handleCancel() {
+        saved = false;
+        closeDialog();
     }
 
     @FXML
@@ -104,30 +103,25 @@ public class ElementFormController implements FormController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(App.ADD_ELEMENT_TYPE_FORM_PATH));
             loader.setControllerFactory(App.getControllerFactory());
-            DialogPane dialogPane = loader.load();
-            FormController controller = loader.getController();
-            controller.setParentController(this);
+            Parent root = loader.load();
+            ElementTypeFormController controller = loader.getController();
 
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setDialogPane(dialogPane);
-            dialog.setTitle("Добавление нового типа");
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Добавление нового типа");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(typeComboBox.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
 
-            dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+            controller.setDialogStage(dialogStage);
 
-            Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-            okButton.setOnAction(event -> {
-                if (controller.handleOk()) {
-                    dialog.setResult(ButtonType.OK);
-                    dialog.close();
-                }
-            });
+            dialogStage.showAndWait();
 
-            Optional<ButtonType> result = dialog.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                updateViews();
+            if (controller.isSaved()) {
+                typeComboBox.getSelectionModel().select(elementDataModel.getNewElementType());
             }
         } catch (IOException e) {
-            showError("Ошибка при открытии формы", e.getMessage());
+            System.out.format("Ошибка при открытии формы: %s", e.getMessage());
         }
     }
 
@@ -136,56 +130,36 @@ public class ElementFormController implements FormController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(App.ADD_ELEMENT_QUALITY_SHORT_FORM_PATH));
             loader.setControllerFactory(App.getControllerFactory());
-            DialogPane dialogPane = loader.load();
-            FormController controller = loader.getController();
-            controller.setParentController(this);
+            Parent root = loader.load();
+            ElementQualityFormController controller = loader.getController();
 
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setDialogPane(dialogPane);
-            dialog.setTitle("Добавление нового качества");
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Добавление нового качества");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(qualityComboBox.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
 
-            dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+            controller.setDialogStage(dialogStage);
 
-            Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-            okButton.setOnAction(event -> {
-                if (controller.handleOk()) {
-                    dialog.setResult(ButtonType.OK);
-                    dialog.close();
-                }
-            });
+            dialogStage.showAndWait();
 
-            Optional<ButtonType> result = dialog.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                updateViews();
+            if (controller.isSaved()) {
+                qualityComboBox.getSelectionModel().select(qualityDataModel.getNewQuality());
             }
         } catch (IOException e) {
-            showError("Ошибка при открытии формы", e.getMessage());
+            System.out.format("Ошибка при открытии формы: %s", e.getMessage());
         }
     }
 
     private boolean validateForm() {
-        StringBuilder errors = new StringBuilder();
+        String code = codeField.getText();
+        ElementType type = typeComboBox.getValue();
+        String name = nameField.getText();
 
-        if (codeField.getText() == null || codeField.getText().trim().isEmpty()) {
-            errors.append("• Код не может быть пустым\n");
-        } else if (codeField.getText().trim().length() < 3) {
-            errors.append("• Код должен содержать минимум 3 символа\n");
-        }
-
-        if (typeComboBox.getValue() == null) {
-            errors.append("• Необходимо выбрать тип элемента\n");
-        }
-
-        if (nameField.getText() == null || nameField.getText().trim().isEmpty()) {
-            errors.append("• Название не может быть пустым\n");
-        }
-
-        if (errors.length() > 0) {
-            showError("Ошибка валидации:\n", errors.toString());
-            return false;
-        }
-
-        return true;
+        return code == null || code.trim().isEmpty() || code.trim().length() < 3 ||
+                type == null ||
+                name == null || name.trim().isEmpty();
     }
 
     private void initializeComboBoxes() {
@@ -213,6 +187,8 @@ public class ElementFormController implements FormController {
             }
         });
 
+        typeComboBox.setItems(elementDataModel.getElementTypes());
+
         qualityComboBox.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(ElementQuality item, boolean empty) {
@@ -236,21 +212,25 @@ public class ElementFormController implements FormController {
                 }
             }
         });
+
+        qualityComboBox.setItems(qualityDataModel.getQualities());
     }
 
-    private void setupValidation() {
-        codeField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[a-zA-Zа-яА-Я0-9_]*")) {
-                codeField.setText(oldValue);
-            }
-        });
+    private void closeDialog() {
+        if (dialogStage != null) {
+            dialogStage.close();
+        }
     }
 
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    public void setDialogStage(Stage dialogStage) {
+        this.dialogStage = dialogStage;
+    }
+
+    public boolean isSaved() {
+        return saved;
+    }
+
+    private <T> ChangeListener<? super T> propertyChangeListener() {
+        return (obs, oldVal, newVal) -> updateOkButtonState();
     }
 }

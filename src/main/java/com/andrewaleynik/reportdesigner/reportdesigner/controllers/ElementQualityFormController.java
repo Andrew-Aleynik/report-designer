@@ -1,66 +1,74 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 
+import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
-import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementQualityService;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
-public class ElementQualityFormController implements FormController {
-    private Controller parentController;
-
-    private ElementQualityService elementQualityService;
-
+public class ElementQualityFormController {
+    private QualityDataModel qualityDataModel;
     @FXML
     private TextField codeField;
+    @FXML
+    private Button okButton;
+    private boolean saved = false;
+    private Stage dialogStage;
 
-    public ElementQualityFormController(ElementQualityService elementQualityService) {
-        this.elementQualityService = elementQualityService;
+
+    public ElementQualityFormController(QualityDataModel qualityDataModel) {
+        this.qualityDataModel = qualityDataModel;
     }
 
-    @Override
-    public void setParentController(Controller controller) {
-        this.parentController = controller;
+    @FXML
+    public void initialize() {
+        codeField.textProperty().addListener((obs, oldVal, newVal) -> {
+            updateOkButtonState();
+        });
+        updateOkButtonState();
     }
 
-    public boolean handleOk() {
-        if (validateForm()) {
+    private void updateOkButtonState() {
+        boolean isNotValid = validateForm();
+        okButton.setDisable(isNotValid);
+    }
+
+    @FXML
+    public void handleOk() {
+        boolean isValid = !validateForm();
+        if (isValid) {
             ElementQuality elementQuality = new ElementQuality();
             elementQuality.setCode(codeField.getText());
-            elementQualityService.saveQuality(elementQuality);
-            return true;
+            qualityDataModel.saveQuality(elementQuality);
+            qualityDataModel.refreshNewQuality(elementQuality);
+            saved = true;
+            closeDialog();
         }
+    }
 
-        return false;
+    @FXML
+    public void handleCancel() {
+        saved = false;
+        closeDialog();
     }
 
     private boolean validateForm() {
-        StringBuilder errors = new StringBuilder();
-
-        if (codeField.getText() == null || codeField.getText().trim().isEmpty()) {
-            errors.append("• Код не может быть пустым\n");
-        } else if (codeField.getText().trim().length() < 3) {
-            errors.append("• Код должен содержать минимум 3 символа\n");
-        }
-
-        if (errors.length() > 0) {
-            showError("Ошибка валидации:\n", errors.toString());
-            return false;
-        }
-
-        return true;
+        String code = codeField.getText();
+        return code == null || code.trim().isEmpty() || code.trim().length() < 3;
     }
 
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void closeDialog() {
+        if (dialogStage != null) {
+            dialogStage.close();
+        }
     }
 
-    @Override
-    public void updateViews() {
-        // Nothing
+    public void setDialogStage(Stage dialogStage) {
+        this.dialogStage = dialogStage;
+    }
+
+    public boolean isSaved() {
+        return saved;
     }
 }

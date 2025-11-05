@@ -3,6 +3,8 @@ package com.andrewaleynik.reportdesigner.reportdesigner;
 import com.andrewaleynik.reportdesigner.reportdesigner.controllers.*;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.*;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.impl.*;
+import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ElementDataModel;
+import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementQualityService;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementQualityServiceImpl;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementService;
@@ -33,6 +35,8 @@ public class App extends javafx.application.Application {
 
     private static final ElementService elementService;
     private static final ElementQualityService elementQualityService;
+    private static final ElementDataModel elementDataModel;
+    private static final QualityDataModel qualityDataModel;
 
     static {
         ElementDao elementDao = new ElementDaoImpl();
@@ -41,8 +45,11 @@ public class App extends javafx.application.Application {
         PropertyDao propertyDao = new PropertyDaoImpl();
         PropertyUnitDao propertyUnitDao = new PropertyUnitDaoImpl();
 
-        elementService = new ElementServiceImpl(elementDao, elementTypeDao, elementQualityDao);
+        elementService = new ElementServiceImpl(elementDao, elementTypeDao);
         elementQualityService = new ElementQualityServiceImpl(elementQualityDao, propertyDao, propertyUnitDao);
+
+        elementDataModel = new ElementDataModel(elementService);
+        qualityDataModel = new QualityDataModel(elementQualityService);
     }
 
     @Override
@@ -64,32 +71,32 @@ public class App extends javafx.application.Application {
         stage.show();
     }
 
+    public static ElementDataModel getElementDataModel() {
+        return elementDataModel;
+    }
+
+    public static QualityDataModel getQualityDataModel() {
+        return qualityDataModel;
+    }
+
     public static void main(String[] args) {
         launch();
-    }
-
-    public static ElementService getElementService() {
-        return elementService;
-    }
-
-    public static ElementQualityService getElementQualityService() {
-        return elementQualityService;
     }
 
     public static Callback<Class<?>, Object> getControllerFactory() {
         return type -> {
             if (type == ElementsTabController.class) {
-                return new ElementsTabController(getElementService());
+                return new ElementsTabController(getElementDataModel());
             } else if (type == ElementQualitiesTabController.class) {
-                return new ElementQualitiesTabController(getElementQualityService());
+                return new ElementQualitiesTabController(getQualityDataModel());
             } else if (type == ElementFormController.class) {
-                return new ElementFormController(getElementService());
+                return new ElementFormController(getElementDataModel(), getQualityDataModel());
             } else if (type == ElementQualityFormController.class) {
-                return new ElementQualityFormController(getElementQualityService());
+                return new ElementQualityFormController(getQualityDataModel());
             } else if (type == ElementTypeFormController.class) {
-                return new ElementTypeFormController(getElementService());
+                return new ElementTypeFormController(getElementDataModel());
             } else {
-                throw new RuntimeException("No suitable constructor for type: " + type.getSimpleName());
+                throw new NoSuchMethodError("No suitable constructor for type: " + type.getSimpleName());
             }
         };
     }

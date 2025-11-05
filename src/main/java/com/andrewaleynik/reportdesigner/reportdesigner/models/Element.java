@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 @Entity
 @Table(name = "elements")
@@ -117,5 +119,41 @@ public class Element {
 
     public void setQuality(ElementQuality quality) {
         this.quality = quality;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", "Element{", "}")
+                .add("id=" + id)
+                .add("code='" + code + "'")
+                .add("type=" + type)
+                .add("parent=" + (parent != null ? parent.getCode() : "null"))
+                .add("children=" + children.stream()
+                        .map(Element::getCode)
+                        .toList())
+                .add("level=" + level)
+                .add("name='" + name + "'")
+                .add("description='" + description + "'")
+                .add("quality=" + quality)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Element element = (Element) o;
+
+        if (id != null && element.id != null) {
+            return id.equals(element.id);
+        }
+
+        return code.equals(element.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(code);
     }
 }

@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor
 
@@ -85,5 +86,24 @@ public class ElementQuality {
 
     public void setActualCost(BigDecimal actualCost) {
         this.actualCost = actualCost;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ElementQuality quality = (ElementQuality) o;
+
+        if (id != null && quality.id != null) {
+            return id.equals(quality.id);
+        }
+
+        return code.equals(quality.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(code);
     }
 }

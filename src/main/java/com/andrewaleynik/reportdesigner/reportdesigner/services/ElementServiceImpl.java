@@ -1,10 +1,8 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.services;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.ElementDao;
-import com.andrewaleynik.reportdesigner.reportdesigner.dao.ElementQualityDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.ElementTypeDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
-import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementType;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -18,13 +16,11 @@ import java.util.stream.Collectors;
 public class ElementServiceImpl implements ElementService {
     private final ElementDao elementDao;
     private final ElementTypeDao elementTypeDao;
-    private final ElementQualityDao elementQualityDao;
     private final Validator validator;
 
-    public ElementServiceImpl(ElementDao elementDao, ElementTypeDao elementTypeDao, ElementQualityDao elementQualityDao) {
+    public ElementServiceImpl(ElementDao elementDao, ElementTypeDao elementTypeDao) {
         this.elementDao = elementDao;
         this.elementTypeDao = elementTypeDao;
-        this.elementQualityDao = elementQualityDao;
         ValidatorFactory factory = Validation.byDefaultProvider()
                 .configure()
                 .messageInterpolator(new ParameterMessageInterpolator())
@@ -46,6 +42,11 @@ public class ElementServiceImpl implements ElementService {
     }
 
     @Override
+    public List<Element> getAllElements() {
+        return elementDao.findAll();
+    }
+
+    @Override
     public List<Element> getRootElements() {
         return elementDao.findRoots();
     }
@@ -58,11 +59,6 @@ public class ElementServiceImpl implements ElementService {
     @Override
     public void saveElementType(ElementType elementType) {
         elementTypeDao.save(elementType);
-    }
-
-    @Override
-    public List<ElementQuality> getAllElementQualities() {
-        return elementQualityDao.findAll();
     }
 
     @Override

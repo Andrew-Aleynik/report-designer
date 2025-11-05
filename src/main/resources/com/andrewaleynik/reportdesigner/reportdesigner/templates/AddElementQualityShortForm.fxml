@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.DialogPane?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<DialogPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementQualityFormController">
-    <headerText>
-        Добавление типа
-    </headerText>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementQualityFormController"
+      spacing="20" style="-fx-padding: 20;">
 
-    <content>
-        <GridPane hgap="10" vgap="10">
-            <Label text="Код:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <TextField fx:id="codeField" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="200"/>
-        </GridPane>
-    </content>
-</DialogPane>
+    <Label text="Добавление качества" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+    <GridPane hgap="10" vgap="10">
+        <Label text="Код:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="codeField" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="200"/>
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button fx:id="okButton" text="OK" defaultButton="true" onAction="#handleOk"/>
+        <Button fx:id="cancelButton" text="Отмена" cancelButton="true" onAction="#handleCancel"/>
+    </HBox>
+</VBox>

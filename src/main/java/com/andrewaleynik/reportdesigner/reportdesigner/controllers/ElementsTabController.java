@@ -1,30 +1,30 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.App;
+import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ElementDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
-import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 public class ElementsTabController implements Controller {
-    private ElementService elementService;
-
-    private Element selectedParentElement;
+    private ElementDataModel elementDataModel;
     @FXML
     private ComboBox<Element> rootElementsComboBox;
     @FXML
     private TreeView<Element> elementsTreeView;
 
 
-    public ElementsTabController(ElementService elementService) {
-        this.elementService = elementService;
+    public ElementsTabController(ElementDataModel elementDataModel) {
+        this.elementDataModel = elementDataModel;
     }
 
     @FXML
@@ -64,6 +64,8 @@ public class ElementsTabController implements Controller {
                 refreshTreeView(selected);
             }
         });
+
+        rootElementsComboBox.setItems(elementDataModel.getRootElements());
     }
 
     private void initializeElementsTreeView() {
@@ -130,35 +132,23 @@ public class ElementsTabController implements Controller {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(App.ADD_ROOT_ELEMENT_FORM_PATH));
             loader.setControllerFactory(App.getControllerFactory());
-            DialogPane dialogPane = loader.load();
-            FormController controller = loader.getController();
-            controller.setParentController(this);
+            Parent root = loader.load();
+            ElementFormController controller = loader.getController();
 
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setDialogPane(dialogPane);
-            dialog.setTitle("Добавление корневого элемента");
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Добавление корневого элемента");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(rootElementsComboBox.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
 
-            dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+            controller.setDialogStage(dialogStage);
 
-            Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-            okButton.setOnAction(event -> {
-                if (controller.handleOk()) {
-                    dialog.setResult(ButtonType.OK);
-                    dialog.close();
-                }
-            });
+            dialogStage.showAndWait();
 
-            Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
-            cancelButton.setOnAction(event -> {
-                dialog.setResult(ButtonType.CANCEL);
-                dialog.close();
-            });
-
-            Optional<ButtonType> result = dialog.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                refreshRootElementsComboBox();
+            if (controller.isSaved()) {
+                rootElementsComboBox.getSelectionModel().select(elementDataModel.getNewElement());
             }
-
         } catch (IOException e) {
             showError("Ошибка при открытии формы", e.getMessage());
         }
@@ -166,55 +156,31 @@ public class ElementsTabController implements Controller {
 
     private void showAddChildElementForm(Element parentElement) {
         try {
+            elementDataModel.refreshSelectedParentElement(parentElement);
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource(App.ADD_CHILD_ELEMENT_FORM_PATH));
             loader.setControllerFactory(App.getControllerFactory());
-            DialogPane dialogPane = loader.load();
+            Parent root = loader.load();
             ElementFormController controller = loader.getController();
-            controller.setParentElement(parentElement);
-            controller.setParentController(this);
 
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setDialogPane(dialogPane);
-            dialog.setTitle("Добавление дочернего элемента");
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Добавление дочернего элемента");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(rootElementsComboBox.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
 
-            dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+            controller.setDialogStage(dialogStage);
 
-            Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-            okButton.setOnAction(event -> {
-                if (controller.handleOk()) {
-                    dialog.setResult(ButtonType.OK);
-                    dialog.close();
-                }
-            });
 
-            Optional<ButtonType> result = dialog.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                Element currentRoot = rootElementsComboBox.getValue();
-                if (currentRoot != null) {
-                    refreshTreeView(currentRoot);
-                }
+            dialogStage.showAndWait();
+
+            Element currentRoot = rootElementsComboBox.getValue();
+            if (currentRoot != null) {
+                refreshTreeView(currentRoot);
             }
-
         } catch (IOException e) {
             showError("Ошибка при открытии формы", e.getMessage());
-        }
-    }
-
-    @Override
-    public void updateViews() {
-        List<Element> rootElements = elementService.getRootElements();
-        rootElementsComboBox.getItems().setAll(rootElements);
-        refreshRootElementsComboBox();
-    }
-
-    private void refreshRootElementsComboBox() {
-        Element selected = rootElementsComboBox.getValue();
-        rootElementsComboBox.getItems().clear();
-        List<Element> rootElements = elementService.getRootElements();
-        rootElementsComboBox.getItems().addAll(rootElements);
-
-        if (selected != null && rootElements.contains(selected)) {
-            rootElementsComboBox.setValue(selected);
         }
     }
 
