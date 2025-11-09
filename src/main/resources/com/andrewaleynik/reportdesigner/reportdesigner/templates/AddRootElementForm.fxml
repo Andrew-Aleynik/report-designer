@@ -7,7 +7,7 @@
       fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementFormController"
       spacing="20" style="-fx-padding: 20;">
 
-    <Label text="Добавление дочернего элемента" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Добавление корневого элемента" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
     <GridPane hgap="10" vgap="10">
         <Label text="Код:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -16,7 +16,7 @@
         <Label text="Тип:" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
         <HBox spacing="5" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2">
             <ComboBox fx:id="typeComboBox" prefWidth="175"/>
-            <Button fx:id="createTypeButton" text="+" style="-fx-font-weight: bold;"
+            <Button text="+" style="-fx-font-weight: bold;"
                     onAction="#handleCreateTypeButton"/>
         </HBox>
 
@@ -30,7 +30,7 @@
         <Label text="Качество:" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
         <HBox spacing="5" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="2">
             <ComboBox fx:id="qualityComboBox" prefWidth="175"/>
-            <Button fx:id="createQualityButton" text="+" style="-fx-font-weight: bold;"
+            <Button text="+" style="-fx-font-weight: bold;"
                     onAction="#handleCreateQualityButton"/>
         </HBox>
     </GridPane>

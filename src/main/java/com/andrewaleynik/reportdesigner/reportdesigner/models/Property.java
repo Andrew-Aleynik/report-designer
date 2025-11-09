@@ -4,6 +4,9 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+import java.util.Optional;
+
 @NoArgsConstructor
 @Entity
 @Table(name = "properties")
@@ -55,5 +58,29 @@ public class Property {
 
     public void setQualityCriterionValue(String qualityCriterionValue) {
         this.qualityCriterionValue = qualityCriterionValue;
+    }
+
+    @Override
+    public String toString() {
+        return "Property{" +
+                "id=" + id +
+                ", quality=" + Optional.ofNullable(quality.getCode()).orElse("") +
+                ", unit=" + unit +
+                ", currentValue='" + currentValue + '\'' +
+                ", qualityCriterionValue='" + qualityCriterionValue + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Property property = (Property) o;
+        return Objects.equals(id, property.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

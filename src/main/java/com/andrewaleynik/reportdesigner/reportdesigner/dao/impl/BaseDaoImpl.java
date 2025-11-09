@@ -2,8 +2,11 @@ package com.andrewaleynik.reportdesigner.reportdesigner.dao.impl;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.BaseDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.util.HibernateSessionFactory;
+import jakarta.persistence.PersistenceException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +14,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class BaseDaoImpl<T> implements BaseDao<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseDaoImpl.class);
+
     private final Class<T> entityClass;
 
     protected Session openSession() {
@@ -31,7 +36,8 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException("Transaction failed", e);
+            LOGGER.error("Transaction failed: {}", e.getMessage(), e);
+            throw new PersistenceException("Transaction failed", e);
         }
     }
 
@@ -46,7 +52,8 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException("Transaction failed", e);
+            LOGGER.error("Transaction failed: {}", e.getMessage(), e);
+            throw new PersistenceException("Transaction failed", e);
         }
     }
 

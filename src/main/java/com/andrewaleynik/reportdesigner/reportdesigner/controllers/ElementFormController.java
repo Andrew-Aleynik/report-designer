@@ -6,6 +6,7 @@ import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataMod
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementType;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.AlertFactory;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,12 +15,18 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class ElementFormController {
-    private ElementDataModel elementDataModel;
-    private QualityDataModel qualityDataModel;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ElementFormController.class);
+    private final ElementDataModel elementDataModel;
+    private final QualityDataModel qualityDataModel;
+    private boolean isEditMode = false;
+
+    private final Element editingElement;
 
     @FXML
     private Label parentElementLabel;
@@ -38,29 +45,57 @@ public class ElementFormController {
 
     @FXML
     private ComboBox<ElementQuality> qualityComboBox;
+
     @FXML
     private Button okButton;
+
     private boolean saved = false;
     private Stage dialogStage;
 
     public ElementFormController(ElementDataModel elementDataModel, QualityDataModel qualityDataModel) {
         this.elementDataModel = elementDataModel;
         this.qualityDataModel = qualityDataModel;
+        this.editingElement = elementDataModel.getSelectedEditElement();
+        if (editingElement != null) {
+            this.isEditMode = true;
+        }
     }
 
     @FXML
     public void initialize() {
         initializeComboBoxes();
-        Element parentElement = elementDataModel.getSelectedParentElement();
-        if (parentElement != null) {
-            parentElementLabel.setText(parentElement.getCode() + " - " + parentElement.getName());
+
+        if (isEditMode && editingElement != null) {
+            populateFormWithElementData();
+        } else {
+            Element parentElement = elementDataModel.getSelectedParentElement();
+            if (parentElement != null) {
+                parentElementLabel.setText(parentElement.getCode() + " - " + parentElement.getName());
+            }
         }
 
         codeField.textProperty().addListener(propertyChangeListener());
-        typeComboBox.placeholderProperty().addListener(propertyChangeListener());
+        typeComboBox.valueProperty().addListener(propertyChangeListener());
         nameField.textProperty().addListener(propertyChangeListener());
 
         updateOkButtonState();
+    }
+
+    private void populateFormWithElementData() {
+        if (editingElement != null) {
+            codeField.setText(editingElement.getCode());
+            typeComboBox.setValue(editingElement.getType());
+            nameField.setText(editingElement.getName());
+            descriptionField.setText(editingElement.getDescription());
+            qualityComboBox.setValue(editingElement.getQuality());
+
+            Element parentElement = editingElement.getParent();
+            if (parentElement != null) {
+                parentElementLabel.setText(parentElement.getCode() + " - " + parentElement.getName());
+            } else {
+                parentElementLabel.setText("Текущий элемент - корневой");
+            }
+        }
     }
 
     private void updateOkButtonState() {
@@ -72,24 +107,43 @@ public class ElementFormController {
     public void handleOk() {
         boolean isValid = !validateForm();
         if (isValid) {
-            Element element = new Element();
-            element.setCode(codeField.getText().trim());
-            element.setType(typeComboBox.getValue());
-            element.setName(nameField.getText().trim());
-            element.setDescription(descriptionField.getText().trim());
-            element.setQuality(qualityComboBox.getValue());
-
-            if (elementDataModel.getSelectedParentElement() != null) {
-                elementDataModel.getSelectedParentElement().addChild(element);
-                element.setLevel(elementDataModel.getSelectedParentElement().getLevel() + 1);
+            if (isEditMode && editingElement != null) {
+                updateExistingElement();
             } else {
-                element.setLevel(0);
+                createNewElement();
             }
 
-            elementDataModel.saveElement(element);
             saved = true;
             closeDialog();
         }
+    }
+
+    private void createNewElement() {
+        Element element = new Element();
+        element.setCode(codeField.getText().trim());
+        element.setType(typeComboBox.getValue());
+        element.setName(nameField.getText().trim());
+        element.setDescription(descriptionField.getText().trim());
+        element.setQuality(qualityComboBox.getValue());
+
+        if (elementDataModel.getSelectedParentElement() != null) {
+            elementDataModel.getSelectedParentElement().addChild(element);
+            element.setLevel(elementDataModel.getSelectedParentElement().getLevel() + 1);
+        } else {
+            element.setLevel(0);
+        }
+
+        elementDataModel.saveElement(element);
+    }
+
+    private void updateExistingElement() {
+        editingElement.setCode(codeField.getText().trim());
+        editingElement.setType(typeComboBox.getValue());
+        editingElement.setName(nameField.getText().trim());
+        editingElement.setDescription(descriptionField.getText().trim());
+        editingElement.setQuality(qualityComboBox.getValue());
+
+        elementDataModel.updateElement(editingElement);
     }
 
     @FXML
@@ -101,7 +155,7 @@ public class ElementFormController {
     @FXML
     private void handleCreateTypeButton() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.ADD_ELEMENT_TYPE_FORM_PATH));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.FxmlPaths.ADD_ELEMENT_TYPE_FORM));
             loader.setControllerFactory(App.getControllerFactory());
             Parent root = loader.load();
             ElementTypeFormController controller = loader.getController();
@@ -121,14 +175,15 @@ public class ElementFormController {
                 typeComboBox.getSelectionModel().select(elementDataModel.getNewElementType());
             }
         } catch (IOException e) {
-            System.out.format("Ошибка при открытии формы: %s", e.getMessage());
+            LOGGER.error("Error opening form: {}", e.getMessage(), e);
+            AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
         }
     }
 
     @FXML
     private void handleCreateQualityButton() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.ADD_ELEMENT_QUALITY_SHORT_FORM_PATH));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.FxmlPaths.ADD_ELEMENT_QUALITY_SHORT_FORM));
             loader.setControllerFactory(App.getControllerFactory());
             Parent root = loader.load();
             ElementQualityFormController controller = loader.getController();
@@ -148,7 +203,8 @@ public class ElementFormController {
                 qualityComboBox.getSelectionModel().select(qualityDataModel.getNewQuality());
             }
         } catch (IOException e) {
-            System.out.format("Ошибка при открытии формы: %s", e.getMessage());
+            LOGGER.error("Error opening form: {}", e.getMessage(), e);
+            AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
         }
     }
 
@@ -232,5 +288,9 @@ public class ElementFormController {
 
     private <T> ChangeListener<? super T> propertyChangeListener() {
         return (obs, oldVal, newVal) -> updateOkButtonState();
+    }
+
+    public boolean isEditMode() {
+        return isEditMode;
     }
 }

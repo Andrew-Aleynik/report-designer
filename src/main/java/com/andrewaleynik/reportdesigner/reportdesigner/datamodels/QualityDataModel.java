@@ -6,11 +6,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class QualityDataModel {
-    private ObservableList<ElementQuality> qualities = FXCollections.observableArrayList();
-
+    private final ObservableList<ElementQuality> qualities = FXCollections.observableArrayList();
     private ElementQuality newQuality;
-
-    private ElementQualityService elementQualityService;
+    private ElementQuality selectedQuality;
+    private final ElementQualityService elementQualityService;
 
     public QualityDataModel(ElementQualityService elementQualityService) {
         this.elementQualityService = elementQualityService;
@@ -24,6 +23,10 @@ public class QualityDataModel {
         return newQuality;
     }
 
+    public ElementQuality getSelectedQuality() {
+        return selectedQuality;
+    }
+
     public void refreshQualities() {
         qualities.setAll(elementQualityService.getAllQualities());
     }
@@ -32,8 +35,17 @@ public class QualityDataModel {
         newQuality = quality;
     }
 
+    public void refreshSelectedQuality(ElementQuality quality) {
+        selectedQuality = quality;
+    }
+
     public void saveQuality(ElementQuality quality) {
         elementQualityService.saveQuality(quality);
+        refreshNewQuality(quality);
         refreshQualities();
+    }
+
+    public void updateQuality(ElementQuality quality) {
+        elementQualityService.updateQuality(quality);
     }
 }

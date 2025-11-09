@@ -7,8 +7,8 @@
          tabClosingPolicy="UNAVAILABLE">
 
     <!-- Первая вкладка - Дерево элементов -->
-    <Tab text="Элементы">
-        <fx:include source="ElementsTab.fxml"/>
+    <Tab text="Дерево элементов">
+        <fx:include source="ElementsTreeTab.fxml"/>
     </Tab>
 
     <!-- Вторая вкладка - Редактирование качеств и свойств -->

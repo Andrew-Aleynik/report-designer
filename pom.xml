@@ -18,6 +18,8 @@
         <hibernate.version>6.3.1.Final</hibernate.version>
         <controlsfx.version>11.1.2</controlsfx.version>
         <jfxtras.version>17-r1</jfxtras.version>
+
+
     </properties>
 
     <dependencies>
@@ -58,6 +60,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>2.0.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.11</version>
         </dependency>
 
         <!-- JSON для экспорта/импорта -->
@@ -132,10 +140,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -192,4 +196,42 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <app.env>dev</app.env>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <includes>
+                            <include>log4j2-dev.xml</include>
+                        </includes>
+                        <targetPath>${project.build.outputDirectory}</targetPath>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+
+<!--        <profile>-->
+<!--            <id>prod</id>-->
+<!--            <properties>-->
+<!--                <app.env>prod</app.env>-->
+<!--            </properties>-->
+<!--            <build>-->
+<!--                <resources>-->
+<!--                    <resource>-->
+<!--                        <directory>src/main/resources</directory>-->
+<!--                        <includes>-->
+<!--                            <include>log4j2-prod.xml</include>-->
+<!--                        </includes>-->
+<!--                        <targetPath>${project.build.outputDirectory}</targetPath>-->
+<!--                    </resource>-->
+<!--                </resources>-->
+<!--            </build>-->
+<!--        </profile>-->
+    </profiles>
 </project>

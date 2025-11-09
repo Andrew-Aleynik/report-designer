@@ -2,12 +2,15 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementFormController"
       spacing="20" style="-fx-padding: 20;">
 
-    <Label text="Добавление дочернего элемента" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Редектирование элемента" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
     <GridPane hgap="10" vgap="10">
         <Label text="Родительский элемент:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -38,6 +41,7 @@
                     onAction="#handleCreateQualityButton"/>
         </HBox>
     </GridPane>
+
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button fx:id="okButton" text="OK" defaultButton="true" onAction="#handleOk"/>
         <Button text="Отмена" cancelButton="true" onAction="#handleCancel"/>

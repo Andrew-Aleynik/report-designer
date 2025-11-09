@@ -13,4 +13,6 @@ public interface ElementQualityService {
     void saveQuality(ElementQuality elementQuality);
 
     void deleteQuality(ElementQuality elementQuality);
+
+    void updateQuality(ElementQuality elementQuality);
 }

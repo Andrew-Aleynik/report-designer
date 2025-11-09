@@ -16,6 +16,6 @@
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button fx:id="okButton" text="OK" defaultButton="true" onAction="#handleOk"/>
-        <Button fx:id="cancelButton" text="Отмена" cancelButton="true" onAction="#handleCancel"/>
+        <Button text="Отмена" cancelButton="true" onAction="#handleCancel"/>
     </HBox>
 </VBox>

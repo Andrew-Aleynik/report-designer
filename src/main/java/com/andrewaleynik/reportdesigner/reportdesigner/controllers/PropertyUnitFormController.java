@@ -1,14 +1,14 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 
-import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ElementDataModel;
-import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementType;
+import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.PropertyDataModel;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyUnit;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class ElementTypeFormController {
-    private final ElementDataModel elementDataModel;
+public class PropertyUnitFormController {
+    private final PropertyDataModel propertyDataModel;
 
     @FXML
     private TextField nameField;
@@ -17,8 +17,8 @@ public class ElementTypeFormController {
     private boolean saved = false;
     private Stage dialogStage;
 
-    public ElementTypeFormController(ElementDataModel elementDataModel) {
-        this.elementDataModel = elementDataModel;
+    public PropertyUnitFormController(PropertyDataModel propertyDataModel) {
+        this.propertyDataModel = propertyDataModel;
     }
 
     @FXML
@@ -38,10 +38,9 @@ public class ElementTypeFormController {
     public void handleOk() {
         boolean isValid = !validateForm();
         if (isValid) {
-            ElementType elementType = new ElementType();
-            elementType.setName(nameField.getText());
-            elementDataModel.saveElementType(elementType);
-            elementDataModel.refreshNewElementType(elementType);
+            PropertyUnit propertyUnit = new PropertyUnit();
+            propertyUnit.setName(nameField.getText());
+            propertyDataModel.savePropertyUnit(propertyUnit);
             saved = true;
             closeDialog();
         }

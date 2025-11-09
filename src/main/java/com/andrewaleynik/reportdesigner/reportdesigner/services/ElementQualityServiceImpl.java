@@ -41,4 +41,8 @@ public class ElementQualityServiceImpl implements ElementQualityService {
     public void deleteQuality(ElementQuality elementQuality) {
         elementQualityDao.delete(elementQuality);
     }
+    @Override
+    public void updateQuality(ElementQuality elementQuality) {
+        elementQualityDao.update(elementQuality);
+    }
 }

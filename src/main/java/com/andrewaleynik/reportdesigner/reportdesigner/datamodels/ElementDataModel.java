@@ -7,16 +7,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class ElementDataModel {
-    private ObservableList<Element> elements = FXCollections.observableArrayList();
-    private ObservableList<Element> rootElements = FXCollections.observableArrayList();
+    private final ObservableList<Element> elements = FXCollections.observableArrayList();
+    private final ObservableList<Element> rootElements = FXCollections.observableArrayList();
     private Element selectedParentElement;
-    private ObservableList<ElementType> elementTypes = FXCollections.observableArrayList();
-
+    private final ObservableList<ElementType> elementTypes = FXCollections.observableArrayList();
     private ElementType newElementType;
-
-    private ElementService elementService;
-
     private Element newElement;
+    private Element selectedEditElement;
+    private final ElementService elementService;
 
     public ElementDataModel(ElementService elementService) {
         this.elementService = elementService;
@@ -46,12 +44,12 @@ public class ElementDataModel {
         return newElement;
     }
 
-    public ElementService getElementService() {
-        return elementService;
+    public Element getSelectedEditElement() {
+        return selectedEditElement;
     }
 
-    public void refreshElements() {
-        elements.setAll(elementService.getAllElements());
+    public ElementService getElementService() {
+        return elementService;
     }
 
     public void refreshRootElements() {
@@ -74,11 +72,19 @@ public class ElementDataModel {
         this.newElement = element;
     }
 
+    public void refreshSelectedEditElement(Element editElement) {
+        this.selectedEditElement = editElement;
+    }
+
     public void saveElement(Element element) {
         elementService.saveElement(element);
-        refreshElements();
         refreshRootElements();
         refreshNewElement(element);
+    }
+
+    public void updateElement(Element element) {
+        elementService.updateElement(element);
+        refreshRootElements();
     }
 
     public void saveElementType(ElementType elementType) {

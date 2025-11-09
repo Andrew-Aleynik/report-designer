@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class ElementQualityFormController {
-    private QualityDataModel qualityDataModel;
+    private final QualityDataModel qualityDataModel;
     @FXML
     private TextField codeField;
     @FXML
@@ -23,9 +23,7 @@ public class ElementQualityFormController {
 
     @FXML
     public void initialize() {
-        codeField.textProperty().addListener((obs, oldVal, newVal) -> {
-            updateOkButtonState();
-        });
+        codeField.textProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
         updateOkButtonState();
     }
 
@@ -41,7 +39,6 @@ public class ElementQualityFormController {
             ElementQuality elementQuality = new ElementQuality();
             elementQuality.setCode(codeField.getText());
             qualityDataModel.saveQuality(elementQuality);
-            qualityDataModel.refreshNewQuality(elementQuality);
             saved = true;
             closeDialog();
         }

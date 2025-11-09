@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<VBox spacing="10"
-      style="-fx-padding: 10;"
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="20" style="-fx-padding: 20;"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementQualitiesTabController">
+
     <!-- Панель управления -->
     <HBox spacing="10" alignment="CENTER_LEFT">
         <Label text="Качества:"/>
@@ -17,5 +14,41 @@
     </HBox>
 
     <!-- Редактирование качества -->
+    <VBox spacing="15" style="-fx-border-color: #cccccc; -fx-border-width: 1; -fx-padding: 15;">
+        <Label text="Редактирование качества" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
+        <GridPane hgap="10" vgap="10">
+            <Label text="Код:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="codeField" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="200"/>
+
+            <Label text="Срок службы:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <HBox spacing="5" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                <TextField fx:id="serviceLifeDaysField" prefWidth="80" promptText="дни"/>
+                <Label text="дней"/>
+            </HBox>
+
+            <Label text="Удовлетворяющая стоимость:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="satisfyingCostField" GridPane.rowIndex="2" GridPane.columnIndex="1" prefWidth="200" promptText="0.00"/>
+
+            <Label text="Фактическая стоимость:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="actualCostField" GridPane.rowIndex="3" GridPane.columnIndex="1" prefWidth="200" promptText="0.00"/>
+        </GridPane>
+
+        <!-- Свойства качества -->
+        <VBox spacing="10">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Свойства качества" style="-fx-font-weight: bold;"/>
+                <Button text="Добавить свойство" onAction="#showAddPropertyForm"/>
+            </HBox>
+
+            <TableView fx:id="propertiesTableView" prefHeight="200">
+            </TableView>
+        </VBox>
+
+        <!-- Кнопки управления -->
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button fx:id="saveButton" text="Сохранить" defaultButton="true" onAction="#handleUpdateQuality"/>
+            <Button text="Удалить" style="-fx-text-fill: red;" onAction="#handleDeleteQuality"/>
+        </HBox>
+    </VBox>
 </VBox>

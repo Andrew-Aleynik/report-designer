@@ -9,7 +9,7 @@
 <VBox spacing="10"
       style="-fx-padding: 10;"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementsTabController">
+      fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementsTreeTabController">
     <!-- Панель управления -->
     <HBox spacing="10" alignment="CENTER_LEFT">
         <Label text="Корневые элементы:"/>

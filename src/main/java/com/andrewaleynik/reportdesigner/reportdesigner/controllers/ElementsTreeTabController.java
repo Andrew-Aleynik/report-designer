@@ -3,6 +3,7 @@ package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 import com.andrewaleynik.reportdesigner.reportdesigner.App;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ElementDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.AlertFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,18 +13,23 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ElementsTabController implements Controller {
-    private ElementDataModel elementDataModel;
+public class ElementsTreeTabController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ElementsTreeTabController.class);
+    private final ElementDataModel elementDataModel;
     @FXML
     private ComboBox<Element> rootElementsComboBox;
     @FXML
     private TreeView<Element> elementsTreeView;
 
 
-    public ElementsTabController(ElementDataModel elementDataModel) {
+    public ElementsTreeTabController(ElementDataModel elementDataModel) {
         this.elementDataModel = elementDataModel;
     }
 
@@ -78,16 +84,25 @@ public class ElementsTabController implements Controller {
                     private final Label separator = new Label("-");
                     private final Label nameLabel = new Label();
                     private final Button addButton = new Button("+");
+                    private final Button editButton = new Button("edit");
 
                     {
-                        hbox.getChildren().setAll(codeLabel, separator, nameLabel, addButton);
+                        hbox.getChildren().setAll(codeLabel, separator, nameLabel, addButton, editButton);
                         separator.setStyle("-fx-text-fill: gray;");
-                        addButton.setStyle("-fx-font-weight: bold; -fx-padding: 0 3;");
+                        editButton.setStyle("-fx-font-weight: bold; -fx-padding: 1 3;");
+                        addButton.setStyle("-fx-font-weight: bold; -fx-padding: 1 3;");
 
                         addButton.setOnAction(event -> {
                             Element currentElement = getItem();
                             if (currentElement != null) {
                                 showAddChildElementForm(currentElement);
+                            }
+                        });
+
+                        editButton.setOnAction(event -> {
+                            Element currentElement = getItem();
+                            if (currentElement != null) {
+                                showEditElementForm(currentElement);
                             }
                         });
                     }
@@ -110,27 +125,74 @@ public class ElementsTabController implements Controller {
     }
 
     private void refreshTreeView(Element rootElement) {
-        TreeItem<Element> root = createTreeItem(rootElement);
+        Map<Element, Boolean> expandedStates = saveExpandedStates();
+
+        TreeItem<Element> root = createTreeItem(rootElement, expandedStates);
         elementsTreeView.setRoot(root);
+
+        restoreExpandedStates(root, expandedStates);
+
         root.setExpanded(true);
     }
 
-    private TreeItem<Element> createTreeItem(Element element) {
+    private Map<Element, Boolean> saveExpandedStates() {
+        Map<Element, Boolean> expandedStates = new HashMap<>();
+        if (elementsTreeView.getRoot() != null) {
+            saveExpandedStatesRecursive(elementsTreeView.getRoot(), expandedStates);
+        }
+        return expandedStates;
+    }
+
+    private void saveExpandedStatesRecursive(TreeItem<Element> item, Map<Element, Boolean> expandedStates) {
+        if (item != null && item.getValue() != null) {
+            expandedStates.put(item.getValue(), item.isExpanded());
+            for (TreeItem<Element> child : item.getChildren()) {
+                saveExpandedStatesRecursive(child, expandedStates);
+            }
+        }
+    }
+
+    private TreeItem<Element> createTreeItem(Element element, Map<Element, Boolean> expandedStates) {
         TreeItem<Element> item = new TreeItem<>(element);
+
+        if (expandedStates.containsKey(element)) {
+            item.setExpanded(expandedStates.get(element));
+        }
 
         if (element.getChildren() != null && !element.getChildren().isEmpty()) {
             for (Element child : element.getChildren()) {
-                item.getChildren().add(createTreeItem(child));
+                item.getChildren().add(createTreeItem(child, expandedStates));
             }
         }
 
         return item;
     }
 
+    private void restoreExpandedStates(TreeItem<Element> root, Map<Element, Boolean> expandedStates) {
+        if (root == null) return;
+
+        restoreExpandedStatesRecursive(root, expandedStates);
+    }
+
+    private void restoreExpandedStatesRecursive(TreeItem<Element> item, Map<Element, Boolean> expandedStates) {
+        if (item != null && item.getValue() != null) {
+            Boolean wasExpanded = expandedStates.get(item.getValue());
+            if (wasExpanded != null) {
+                item.setExpanded(wasExpanded);
+            }
+            for (TreeItem<Element> child : item.getChildren()) {
+                restoreExpandedStatesRecursive(child, expandedStates);
+            }
+        }
+    }
+
     @FXML
     private void showAddRootElementForm() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.ADD_ROOT_ELEMENT_FORM_PATH));
+            elementDataModel.refreshSelectedParentElement(null);
+            elementDataModel.refreshSelectedEditElement(null);
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.FxmlPaths.ADD_ROOT_ELEMENT_FORM));
             loader.setControllerFactory(App.getControllerFactory());
             Parent root = loader.load();
             ElementFormController controller = loader.getController();
@@ -150,15 +212,17 @@ public class ElementsTabController implements Controller {
                 rootElementsComboBox.getSelectionModel().select(elementDataModel.getNewElement());
             }
         } catch (IOException e) {
-            showError("Ошибка при открытии формы", e.getMessage());
+            LOGGER.error("Error opening form: {}", e.getMessage(), e);
+            AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
         }
     }
 
     private void showAddChildElementForm(Element parentElement) {
         try {
             elementDataModel.refreshSelectedParentElement(parentElement);
+            elementDataModel.refreshSelectedEditElement(null);
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.ADD_CHILD_ELEMENT_FORM_PATH));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.FxmlPaths.ADD_CHILD_ELEMENT_FORM));
             loader.setControllerFactory(App.getControllerFactory());
             Parent root = loader.load();
             ElementFormController controller = loader.getController();
@@ -172,23 +236,42 @@ public class ElementsTabController implements Controller {
 
             controller.setDialogStage(dialogStage);
 
-
+            Element selectedRoot = rootElementsComboBox.getSelectionModel().getSelectedItem();
             dialogStage.showAndWait();
-
-            Element currentRoot = rootElementsComboBox.getValue();
-            if (currentRoot != null) {
-                refreshTreeView(currentRoot);
-            }
+            rootElementsComboBox.getSelectionModel().select(selectedRoot);
+            refreshTreeView(rootElementsComboBox.getSelectionModel().getSelectedItem());
         } catch (IOException e) {
-            showError("Ошибка при открытии формы", e.getMessage());
+            LOGGER.error("Error opening form: {}", e.getMessage(), e);
+            AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
         }
     }
 
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void showEditElementForm(Element editingElement) {
+        try {
+            elementDataModel.refreshSelectedParentElement(null);
+            elementDataModel.refreshSelectedEditElement(editingElement);
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.FxmlPaths.EDIT_ELEMENT_FORM));
+            loader.setControllerFactory(App.getControllerFactory());
+            Parent root = loader.load();
+            ElementFormController controller = loader.getController();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Редактирование элемента");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(rootElementsComboBox.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+
+            controller.setDialogStage(dialogStage);
+
+            Element selectedRoot = rootElementsComboBox.getSelectionModel().getSelectedItem();
+            dialogStage.showAndWait();
+            rootElementsComboBox.getSelectionModel().select(selectedRoot);
+            refreshTreeView(rootElementsComboBox.getSelectionModel().getSelectedItem());
+        } catch (IOException e) {
+            LOGGER.error("Error opening form: {}", e.getMessage(), e);
+            AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
+        }
     }
 }

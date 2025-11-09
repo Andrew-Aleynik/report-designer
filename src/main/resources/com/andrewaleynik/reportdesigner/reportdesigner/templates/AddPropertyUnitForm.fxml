@@ -4,10 +4,10 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementTypeFormController"
+      fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.PropertyUnitFormController"
       spacing="20" style="-fx-padding: 20;">
 
-    <Label text="Добавление типа" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Добавление размерности" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
     <GridPane hgap="10" vgap="10">
         <Label text="Название:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>

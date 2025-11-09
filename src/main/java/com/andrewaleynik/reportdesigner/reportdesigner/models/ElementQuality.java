@@ -64,6 +64,13 @@ public class ElementQuality {
         property.setQuality(this);
     }
 
+    public void removeProperty(Property property) {
+        if (properties.contains(property)) {
+            properties.remove(property);
+            property.setQuality(null);
+        }
+    }
+
     public Duration getServiceLife() {
         return this.serviceLife;
     }
