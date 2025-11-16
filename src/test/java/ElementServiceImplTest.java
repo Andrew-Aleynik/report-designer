@@ -34,7 +34,7 @@ class ElementServiceImplTest {
         elementDao = mock();
         elementTypeDao = mock();
         elementQualityDao = mock();
-        elementService = new ElementServiceImpl(elementDao, elementTypeDao, elementQualityDao);
+        elementService = new ElementServiceImpl(elementDao, elementTypeDao);
     }
 
     @BeforeEach

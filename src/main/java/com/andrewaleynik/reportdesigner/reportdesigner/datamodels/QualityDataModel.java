@@ -48,4 +48,8 @@ public class QualityDataModel {
     public void updateQuality(ElementQuality quality) {
         elementQualityService.updateQuality(quality);
     }
+
+    public void deleteQuality(ElementQuality quality) {
+        elementQualityService.deleteQuality(quality);
+    }
 }

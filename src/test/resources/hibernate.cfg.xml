@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- Database connection settings for H2 -->
+        <property name="hibernate.connection.driver_class">org.h2.Driver</property>
+        <property name="hibernate.connection.url">jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1</property>
+        <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.connection.password"></property>
+
+        <property name="javax.persistence.validation.mode">none</property>
+
+        <!-- JDBC connection pool settings -->
+        <property name="hibernate.c3p0.min_size">5</property>
+        <property name="hibernate.c3p0.max_size">20</property>
+        <property name="hibernate.c3p0.timeout">300</property>
+        <property name="hibernate.c3p0.max_statements">50</property>
+        <property name="hibernate.c3p0.idle_test_period">3000</property>
+
+        <!-- SQL dialect -->
+        <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
+
+        <!-- Echo all executed SQL to stdout -->
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+        <property name="hibernate.use_sql_comments">true</property>
+
+        <!-- Auto create/update database schema -->
+        <property name="hibernate.hbm2ddl.auto">create-drop</property>
+
+        <!-- Current session context -->
+        <property name="hibernate.current_session_context_class">thread</property>
+
+        <!-- Batch settings -->
+        <property name="hibernate.jdbc.batch_size">20</property>
+        <property name="hibernate.order_inserts">true</property>
+        <property name="hibernate.order_updates">true</property>
+        <property name="hibernate.batch_versioned_data">true</property>
+
+        <!-- Second-level cache -->
+        <property name="hibernate.cache.use_second_level_cache">false</property>
+        <property name="hibernate.cache.use_query_cache">false</property>
+
+        <!-- H2 specific settings -->
+        <property name="hibernate.hbm2ddl.import_files">import.sql</property>
+
+        <!-- Mapping annotated classes -->
+        <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.Element"/>
+        <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.ElementType"/>
+        <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality"/>
+        <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.Property"/>
+        <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyUnit"/>
+        <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluence"/>
+
+    </session-factory>
+</hibernate-configuration>

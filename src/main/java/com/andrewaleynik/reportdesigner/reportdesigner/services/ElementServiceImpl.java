@@ -110,11 +110,23 @@ public class ElementServiceImpl implements ElementService {
             throw new IllegalArgumentException("Element with id " + element.getId() + " not found");
         }
 
-        if (!element.getChildren().isEmpty()) {
-            deleteChildrenRecursively(element);
+        if (element.getParent() != null) {
+            deleteCascade(element.getParent());
+        } else {
+            deleteCascade(element);
+            elementDao.delete(element);
+        }
+    }
+
+    private void deleteCascade(Element element) {
+        List<Element> childrenCopy = new ArrayList<>(element.getChildren());
+        for (Element child: childrenCopy) {
+            element.getChildren().remove(child);
+            child.setParent(null);
+            deleteCascade(child);
         }
 
-        elementDao.delete(element);
+        elementDao.update(element);
     }
 
     @Override
@@ -144,16 +156,6 @@ public class ElementServiceImpl implements ElementService {
                 child.setLevel(parent.getLevel() + 1);
                 elementDao.update(child);
                 updateChildrenLevels(child);
-            }
-        }
-    }
-
-    private void deleteChildrenRecursively(Element parent) {
-        if (parent.getChildren() != null && !parent.getChildren().isEmpty()) {
-            List<Element> children = new ArrayList<>(parent.getChildren());
-            for (Element child : children) {
-                deleteChildrenRecursively(child);
-                elementDao.delete(child);
             }
         }
     }

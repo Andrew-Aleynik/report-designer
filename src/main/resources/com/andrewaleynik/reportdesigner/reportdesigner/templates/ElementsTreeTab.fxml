@@ -20,4 +20,8 @@
     <!-- Дерево элементов -->
     <TreeView fx:id="elementsTreeView" VBox.vgrow="ALWAYS">
     </TreeView>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button fx:id="exportToPdf" text="Выгрузить в PDF" defaultButton="true" onAction="#showPreviewExportToPdf"/>
+    </HBox>
 </VBox>

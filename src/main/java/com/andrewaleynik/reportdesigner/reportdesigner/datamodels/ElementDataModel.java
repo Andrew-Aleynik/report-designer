@@ -3,8 +3,11 @@ package com.andrewaleynik.reportdesigner.reportdesigner.datamodels;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementType;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementService;
+import com.andrewaleynik.reportdesigner.reportdesigner.services.PdfExportService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.io.File;
 
 public class ElementDataModel {
     private final ObservableList<Element> elements = FXCollections.observableArrayList();
@@ -15,9 +18,11 @@ public class ElementDataModel {
     private Element newElement;
     private Element selectedEditElement;
     private final ElementService elementService;
+    private final PdfExportService pdfExportService;
 
-    public ElementDataModel(ElementService elementService) {
+    public ElementDataModel(ElementService elementService, PdfExportService pdfExportService) {
         this.elementService = elementService;
+        this.pdfExportService = pdfExportService;
     }
 
     public ObservableList<Element> getElements() {
@@ -87,8 +92,16 @@ public class ElementDataModel {
         refreshRootElements();
     }
 
+    public void deleteElement(Element element) {
+        elementService.deleteElement(element);
+    }
+
     public void saveElementType(ElementType elementType) {
         elementService.saveElementType(elementType);
         refreshElementTypes();
+    }
+
+    public File exportElementsTreeToPdf(Element root) {
+        return pdfExportService.exportElementsTree(root);
     }
 }

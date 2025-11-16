@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -70,9 +71,11 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
     @Override
     public void delete(T entity) {
         executeInTransaction(em -> {
-            if (em.contains(entity)) {
-                em.remove(entity);
-            }
+            boolean isManaged = em.contains(entity);
+
+            T entityToRemove = isManaged ? entity : em.merge(entity);
+
+            em.remove(entityToRemove);
         });
     }
 

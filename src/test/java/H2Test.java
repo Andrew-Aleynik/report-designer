@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class H2Test extends BaseTest {
@@ -17,6 +18,7 @@ class H2Test extends BaseTest {
     private ElementTypeDao elementTypeDao;
     private ElementQualityDao elementQualityDao;
     private PropertyUnitDao propertyUnitDao;
+    private PropertyDao propertyDao;
     private ExternalInfluenceDao externalInfluenceDao;
 
     @BeforeEach
@@ -26,6 +28,7 @@ class H2Test extends BaseTest {
         elementTypeDao = new ElementTypeDaoImpl();
         elementQualityDao = new ElementQualityDaoImpl();
         propertyUnitDao = new PropertyUnitDaoImpl();
+        propertyDao = new PropertyDaoImpl();
         externalInfluenceDao = new ExternalInfluenceDaoImpl();
     }
 
@@ -74,7 +77,7 @@ class H2Test extends BaseTest {
 
         Optional<Element> deletedElementOptional = elementDao.findById(element.getId());
 
-        assertThat(deletedElementOptional).isPresent();
+        assertThat(deletedElementOptional).isEmpty();
     }
 
     @Test
@@ -137,6 +140,7 @@ class H2Test extends BaseTest {
     @Test
     void testElementQualityWithProperties() {
         ElementQuality quality = new ElementQuality();
+        quality.setCode("HTPTS");
         quality.setServiceLife(Duration.ofDays(3650));
         quality.setSatisfyingCost(new BigDecimal("100000.00"));
         quality.setActualCost(new BigDecimal("95000.00"));
@@ -149,7 +153,6 @@ class H2Test extends BaseTest {
         property.setCurrentValue("100");
         property.setQualityCriterionValue("200");
         property.setUnit(unit);
-
         quality.addProperty(property);
         elementQualityDao.save(quality);
 
@@ -280,6 +283,42 @@ class H2Test extends BaseTest {
         assertThat(level1Elements.get(0).getCode()).isEqualTo("LEVEL_TEST");
     }
 
+    @Test
+    void testDeleteElement() {
+        ElementType type = createElementType("Удаление");
+        elementTypeDao.save(type);
+
+        ElementQuality quality = createElementQuality();
+        elementQualityDao.save(quality);
+
+        Element element = new Element();
+        element.setCode("DELETE_TEST");
+        element.setName("Тест удаления");
+        element.setType(type);
+        element.setQuality(quality);
+        element.setLevel(0);
+
+        Element child = new Element();
+        child.setCode("DELETE_TEST1");
+        child.setName("Тест удаления 1");
+        child.setType(type);
+        child.setQuality(quality);
+        child.setLevel(1);
+
+        element.addChild(child);
+        child.setParent(element);
+        elementDao.save(element);
+        Long elementId = element.getId();
+        Long childId = child.getId();
+        child.getParent().getChildren().remove(child);
+        child.setParent(null);
+        elementDao.update(element);
+        Optional<Element> foundOptional = elementDao.findById(elementId);
+        assertThat(foundOptional).isPresent();
+        foundOptional = elementDao.findById(childId);
+        assertThat(foundOptional).isEmpty();
+    }
+
     private ElementType createElementType(String name) {
         ElementType type = new ElementType();
         type.setName(name);
@@ -288,6 +327,7 @@ class H2Test extends BaseTest {
 
     private ElementQuality createElementQuality() {
         ElementQuality quality = new ElementQuality();
+        quality.setCode("HTPT");
         quality.setServiceLife(Duration.ofDays(3650));
         quality.setSatisfyingCost(new BigDecimal("75000.00"));
         quality.setActualCost(new BigDecimal("72000.00"));

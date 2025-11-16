@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      prefHeight="700" prefWidth="900"
+      spacing="10"
+      fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.PreviewController">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <ToolBar>
+        <HBox spacing="10">
+            <Button text="Сохранить" onAction="#handleSave" fx:id="saveButton"/>
+            <Button text="Печать" onAction="#handlePrint" fx:id="printButton" disable="true"/>
+            <Button text="Закрыть" onAction="#handleClose" fx:id="closeButton"
+                    style="-fx-background-color: #ff4444; -fx-text-fill: white;"/>
+        </HBox>
+    </ToolBar>
+
+    <Label fx:id="statusLabel" text="Предпросмотр отчета"/>
+
+    <BorderPane VBox.vgrow="ALWAYS">
+        <center>
+            <StackPane>
+                <ScrollPane fx:id="scrollPane">
+                    <VBox fx:id="pagesContainer" spacing="10"/>
+                </ScrollPane>
+            </StackPane>
+        </center>
+    </BorderPane>
+</VBox>

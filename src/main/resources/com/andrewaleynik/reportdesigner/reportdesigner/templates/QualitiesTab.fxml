@@ -18,20 +18,23 @@
         <Label text="Редактирование качества" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
         <GridPane hgap="10" vgap="10">
-            <Label text="Код:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <TextField fx:id="codeField" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="200"/>
+            <Label text="Связан с :" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label fx:id="elementNameField" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="200"/>
 
-            <Label text="Срок службы:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-            <HBox spacing="5" GridPane.rowIndex="1" GridPane.columnIndex="1">
+            <Label text="Код:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="codeField" GridPane.rowIndex="1" GridPane.columnIndex="1" prefWidth="200"/>
+
+            <Label text="Срок службы:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <HBox spacing="5" GridPane.rowIndex="2" GridPane.columnIndex="1">
                 <TextField fx:id="serviceLifeDaysField" prefWidth="80" promptText="дни"/>
                 <Label text="дней"/>
             </HBox>
 
-            <Label text="Удовлетворяющая стоимость:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-            <TextField fx:id="satisfyingCostField" GridPane.rowIndex="2" GridPane.columnIndex="1" prefWidth="200" promptText="0.00"/>
+            <Label text="Удовлетворяющая стоимость:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="satisfyingCostField" GridPane.rowIndex="3" GridPane.columnIndex="1" prefWidth="200" promptText="0.00"/>
 
-            <Label text="Фактическая стоимость:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-            <TextField fx:id="actualCostField" GridPane.rowIndex="3" GridPane.columnIndex="1" prefWidth="200" promptText="0.00"/>
+            <Label text="Фактическая стоимость:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <TextField fx:id="actualCostField" GridPane.rowIndex="4" GridPane.columnIndex="1" prefWidth="200" promptText="0.00"/>
         </GridPane>
 
         <!-- Свойства качества -->
@@ -48,7 +51,7 @@
         <!-- Кнопки управления -->
         <HBox spacing="10" alignment="CENTER_RIGHT">
             <Button fx:id="saveButton" text="Сохранить" defaultButton="true" onAction="#handleUpdateQuality"/>
-            <Button text="Удалить" style="-fx-text-fill: red;" onAction="#handleDeleteQuality"/>
+            <Button fx:id="deleteButton" text="Удалить" style="-fx-text-fill: red;" onAction="#handleDeleteQuality"/>
         </HBox>
     </VBox>
 </VBox>

@@ -1,6 +1,7 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.App;
+import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ElementDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.PropertyDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
@@ -22,10 +23,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Optional;
 
 public class ElementQualitiesTabController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ElementQualitiesTabController.class);
+    private final ElementDataModel elementDataModel;
     private final QualityDataModel qualityDataModel;
     private final PropertyDataModel propertyDataModel;
     @FXML
@@ -42,8 +45,14 @@ public class ElementQualitiesTabController {
     private TableView<Property> propertiesTableView;
     @FXML
     private Button saveButton;
+    @FXML
+    private Button deleteButton;
 
-    public ElementQualitiesTabController(QualityDataModel qualityDataModel, PropertyDataModel propertyDataModel) {
+    private boolean isSaved = false;
+
+    public ElementQualitiesTabController(ElementDataModel elementDataModel, QualityDataModel qualityDataModel,
+                                         PropertyDataModel propertyDataModel) {
+        this.elementDataModel = elementDataModel;
         this.qualityDataModel = qualityDataModel;
         this.propertyDataModel = propertyDataModel;
     }
@@ -52,11 +61,28 @@ public class ElementQualitiesTabController {
     public void initialize() {
         initializeElementQualitiesComboBox();
         initializePropertiesTableView();
-        codeField.textProperty().addListener((obs, oldVal, newVal) -> updateSaveButtonState());
-        serviceLifeDaysField.textProperty().addListener((obs, oldVal, newVal) -> updateSaveButtonState());
-        satisfyingCostField.textProperty().addListener((obs, oldVal, newVal) -> updateSaveButtonState());
-        actualCostField.textProperty().addListener((obs, oldVal, newVal) -> updateSaveButtonState());
-
+        codeField.textProperty().addListener((obs, oldVal, newVal) -> {
+            isSaved = false;
+            updateSaveButtonState();
+            updateDeleteButtonState();
+        });
+        serviceLifeDaysField.textProperty().addListener((obs, oldVal, newVal) -> {
+            isSaved = false;
+            updateSaveButtonState();
+            updateDeleteButtonState();
+        });
+        satisfyingCostField.textProperty().addListener((obs, oldVal, newVal) -> {
+            isSaved = false;
+            updateSaveButtonState();
+            updateDeleteButtonState();
+        });
+        actualCostField.textProperty().addListener((obs, oldVal, newVal) -> {
+            isSaved = false;
+            updateSaveButtonState();
+            updateDeleteButtonState();
+        });
+        updateSaveButtonState();
+        updateDeleteButtonState();
     }
 
     private void initializeElementQualitiesComboBox() {
@@ -90,6 +116,9 @@ public class ElementQualitiesTabController {
                 propertyDataModel.refreshCurrentProperties(qualityDataModel.getSelectedQuality().getProperties());
                 populateFormWithQualityData();
             }
+            isSaved = false;
+            updateSaveButtonState();
+            updateDeleteButtonState();
         });
 
         elementQualitiesComboBox.setItems(qualityDataModel.getQualities());
@@ -99,7 +128,6 @@ public class ElementQualitiesTabController {
         TableColumn<Property, String> unitColumn = new TableColumn<>("Единица измерения");
         unitColumn.setCellValueFactory(cellData -> {
             Property property = cellData.getValue();
-            // Если unit - это объект PropertyUnit, получаем его имя
             if (property.getUnit() != null) {
                 return new SimpleStringProperty(property.getUnit().getName());
             } else {
@@ -118,7 +146,6 @@ public class ElementQualitiesTabController {
             }
         });
 
-        // Столбец для текущего значения
         TableColumn<Property, String> currentValueColumn = new TableColumn<>("Текущее значение");
         currentValueColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getCurrentValue()));
@@ -135,7 +162,6 @@ public class ElementQualitiesTabController {
         });
 
 
-        // Столбец для значения критерия качества
         TableColumn<Property, String> criterionValueColumn = new TableColumn<>("Критерий качества");
         criterionValueColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getQualityCriterionValue()));
@@ -152,9 +178,9 @@ public class ElementQualitiesTabController {
         });
 
         TableColumn<Property, Void> actionsColumn = new TableColumn<>("Действия");
-        actionsColumn.setCellFactory(column -> new TableCell<Property, Void>() {
-            private final Button editButton = new Button("Ред.");
-            private final Button deleteButton = new Button("Уд.");
+        actionsColumn.setCellFactory(column -> new TableCell<>() {
+            private final Button editButton = new Button("Редактировать");
+            private final Button deleteButton = new Button("Удалить");
 
             {
                 editButton.setStyle("-fx-font-size: 10px; -fx-padding: 2 5;");
@@ -163,11 +189,17 @@ public class ElementQualitiesTabController {
                 editButton.setOnAction(event -> {
                     Property property = getTableView().getItems().get(getIndex());
                     handleEditProperty(property);
+                    isSaved = false;
+                    updateSaveButtonState();
+                    updateDeleteButtonState();
                 });
 
                 deleteButton.setOnAction(event -> {
                     Property property = getTableView().getItems().get(getIndex());
                     handleDeleteProperty(property);
+                    isSaved = false;
+                    updateSaveButtonState();
+                    updateDeleteButtonState();
                 });
             }
 
@@ -191,6 +223,7 @@ public class ElementQualitiesTabController {
 
         propertiesTableView.getColumns().clear();
         propertiesTableView.getColumns().addAll(unitColumn, currentValueColumn, criterionValueColumn, actionsColumn);
+        propertiesTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_NEXT_COLUMN);
         propertiesTableView.setItems(propertyDataModel.getCurrentProperties());
     }
 
@@ -216,12 +249,21 @@ public class ElementQualitiesTabController {
                             .map(BigDecimal::toString)
                             .orElse("")
             );
+        } else {
+            codeField.setText("");
+            serviceLifeDaysField.setText("");
+            satisfyingCostField.setText("");
+            actualCostField.setText("");
         }
     }
 
     private void updateSaveButtonState() {
         boolean isNotValid = validateForm();
-        saveButton.setDisable(isNotValid);
+        saveButton.setDisable(isNotValid || isSaved);
+    }
+
+    private void updateDeleteButtonState() {
+        deleteButton.setDisable(elementQualitiesComboBox.getValue() == null || !isSaved);
     }
 
     @FXML
@@ -245,6 +287,9 @@ public class ElementQualitiesTabController {
 
             if (controller.isSaved()) {
                 elementQualitiesComboBox.getSelectionModel().select(qualityDataModel.getNewQuality());
+                isSaved = true;
+                updateSaveButtonState();
+                updateDeleteButtonState();
             }
         } catch (IOException e) {
             LOGGER.error("Error opening form: {}", e.getMessage(), e);
@@ -276,11 +321,23 @@ public class ElementQualitiesTabController {
             quality.setProperties(propertiesTableView.getItems());
             qualityDataModel.updateQuality(quality);
             qualityDataModel.refreshSelectedQuality(quality);
+            elementDataModel.refreshRootElements();
+            isSaved = true;
+            updateSaveButtonState();
+            updateDeleteButtonState();
         }
     }
 
     @FXML
     public void handleDeleteQuality() {
+        qualityDataModel.deleteQuality(elementQualitiesComboBox.getValue());
+        qualityDataModel.refreshQualities();
+        qualityDataModel.refreshSelectedQuality(null);
+        populateFormWithQualityData();
+        propertyDataModel.refreshCurrentProperties(Collections.emptyList());
+        isSaved = true;
+        updateSaveButtonState();
+        updateDeleteButtonState();
     }
 
     @FXML
@@ -304,6 +361,10 @@ public class ElementQualitiesTabController {
             controller.setDialogStage(dialogStage);
 
             dialogStage.showAndWait();
+
+            isSaved = false;
+            updateSaveButtonState();
+            updateDeleteButtonState();
         } catch (IOException e) {
             LOGGER.error("Error opening form: {}", e.getMessage(), e);
             AlertFactory.showError("Ошибка при открытии формы", e.getMessage());

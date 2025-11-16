@@ -1,7 +1,7 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.util;
 
-import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
@@ -9,8 +9,13 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 public class AlertFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(AlertFactory.class);
+
+    private AlertFactory() {
+    }
 
     public static void showError(String title, String message) {
         showAlert(Alert.AlertType.ERROR, title, null, message);
@@ -24,16 +29,11 @@ public class AlertFactory {
         showAlert(Alert.AlertType.INFORMATION, title, null, message);
     }
 
-    public static void showConfirmation(String title, String header, String message) {
-        showAlert(Alert.AlertType.CONFIRMATION, title, header, message);
+    public static Optional<ButtonType> showConfirmation(String title, String header, String message) {
+        return showAlert(Alert.AlertType.CONFIRMATION, title, header, message);
     }
 
-    private static void showAlert(Alert.AlertType alertType, String title, String header, String message) {
-        if (!Platform.isFxApplicationThread()) {
-            Platform.runLater(() -> showAlert(alertType, title, header, message));
-            return;
-        }
-
+    private static Optional<ButtonType> showAlert(Alert.AlertType alertType, String title, String header, String message) {
         try {
             Alert alert = new Alert(alertType);
             alert.setTitle(title);
@@ -41,10 +41,10 @@ public class AlertFactory {
             alert.setContentText(message);
 
             setupAlert(alert);
-            alert.showAndWait();
-
+            return alert.showAndWait();
         } catch (Exception e) {
             LOGGER.error("Error display alert {}: {}", title, e.getMessage());
+            return Optional.empty();
         }
     }
 

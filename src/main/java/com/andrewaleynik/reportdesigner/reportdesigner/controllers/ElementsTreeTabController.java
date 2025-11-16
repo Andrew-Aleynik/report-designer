@@ -16,6 +16,7 @@ import javafx.util.Callback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,12 +85,12 @@ public class ElementsTreeTabController {
                     private final Label separator = new Label("-");
                     private final Label nameLabel = new Label();
                     private final Button addButton = new Button("+");
-                    private final Button editButton = new Button("edit");
+                    private final Button editButton = new Button("Редактировать");
+                    private final Button deleteButton = new Button("Удалить");
 
                     {
-                        hbox.getChildren().setAll(codeLabel, separator, nameLabel, addButton, editButton);
+                        hbox.getChildren().setAll(codeLabel, separator, nameLabel, addButton, editButton, deleteButton);
                         separator.setStyle("-fx-text-fill: gray;");
-                        editButton.setStyle("-fx-font-weight: bold; -fx-padding: 1 3;");
                         addButton.setStyle("-fx-font-weight: bold; -fx-padding: 1 3;");
 
                         addButton.setOnAction(event -> {
@@ -103,6 +104,16 @@ public class ElementsTreeTabController {
                             Element currentElement = getItem();
                             if (currentElement != null) {
                                 showEditElementForm(currentElement);
+                            }
+                        });
+
+                        deleteButton.setOnAction(event -> {
+                            Element currentElement = getItem();
+                            if (currentElement != null) {
+                                LOGGER.debug("Current element: " + currentElement);
+                                elementDataModel.deleteElement(currentElement);
+                                elementDataModel.refreshRootElements();
+                                refreshTreeView(rootElementsComboBox.getValue());
                             }
                         });
                     }
@@ -125,14 +136,18 @@ public class ElementsTreeTabController {
     }
 
     private void refreshTreeView(Element rootElement) {
-        Map<Element, Boolean> expandedStates = saveExpandedStates();
+        if (rootElement == null) {
+            elementsTreeView.setRoot(null);
+        } else {
+            Map<Element, Boolean> expandedStates = saveExpandedStates();
 
-        TreeItem<Element> root = createTreeItem(rootElement, expandedStates);
-        elementsTreeView.setRoot(root);
+            TreeItem<Element> root = createTreeItem(rootElement, expandedStates);
+            elementsTreeView.setRoot(root);
 
-        restoreExpandedStates(root, expandedStates);
+            restoreExpandedStates(root, expandedStates);
 
-        root.setExpanded(true);
+            root.setExpanded(true);
+        }
     }
 
     private Map<Element, Boolean> saveExpandedStates() {
@@ -211,6 +226,36 @@ public class ElementsTreeTabController {
             if (controller.isSaved()) {
                 rootElementsComboBox.getSelectionModel().select(elementDataModel.getNewElement());
             }
+        } catch (IOException e) {
+            LOGGER.error("Error opening form: {}", e.getMessage(), e);
+            AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
+        }
+    }
+
+    @FXML
+    public void showPreviewExportToPdf() {
+        try {
+            Element currentRoot = rootElementsComboBox.getValue();
+            File pdfFile = elementDataModel.exportElementsTreeToPdf(currentRoot);
+
+            LOGGER.debug("PDF was created");
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.FxmlPaths.EXPORT_PREVIEW));
+            loader.setControllerFactory(App.getControllerFactory());
+            Parent root = loader.load();
+            PreviewController controller = loader.getController();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Предпросмотр");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(rootElementsComboBox.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+
+            controller.setDialogStage(dialogStage);
+            controller.setPdfFile(pdfFile);
+
+            dialogStage.showAndWait();
         } catch (IOException e) {
             LOGGER.error("Error opening form: {}", e.getMessage(), e);
             AlertFactory.showError("Ошибка при открытии формы", e.getMessage());

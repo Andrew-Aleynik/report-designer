@@ -43,8 +43,18 @@ public class App extends javafx.application.Application {
         public static final String ADD_PROPERTY_UNIT_FORM =
                 "/com/andrewaleynik/reportdesigner/reportdesigner/templates/AddPropertyUnitForm.fxml";
 
+        public static final String EXPORT_PREVIEW =
+                "/com/andrewaleynik/reportdesigner/reportdesigner/templates/PdfPreview.fxml";
         private FxmlPaths() {
         }
+    }
+
+    public static final class FontPaths {
+        public static final String ARIAL = "/com/andrewaleynik/reportdesigner/reportdesigner/fonts/arialmt.ttf";
+        public static final String ARIAL_BOLD_ITALIC =
+                "/com/andrewaleynik/reportdesigner/reportdesigner/fonts/arialmt.ttf";
+
+        private FontPaths(){}
     }
 
     private static final ElementDataModel elementDataModel;
@@ -65,8 +75,11 @@ public class App extends javafx.application.Application {
             ElementQualityService elementQualityService =
                     new ElementQualityServiceImpl(elementQualityDao, propertyDao, propertyUnitDao);
             PropertyService propertyService = new PropertyServiceImpl(propertyDao, propertyUnitDao);
+            PdfExportService pdfExportService = new PdfExportService(
+                    new ElementsTreePdfExportService()
+            );
 
-            elementDataModel = new ElementDataModel(elementService);
+            elementDataModel = new ElementDataModel(elementService, pdfExportService);
             qualityDataModel = new QualityDataModel(elementQualityService);
             propertyDataModel = new PropertyDataModel(propertyService);
 
@@ -151,7 +164,7 @@ public class App extends javafx.application.Application {
         if (ElementsTreeTabController.class.equals(controllerClass)) {
             return new ElementsTreeTabController(getElementDataModel());
         } else if (ElementQualitiesTabController.class.equals(controllerClass)) {
-            return new ElementQualitiesTabController(getQualityDataModel(), getPropertyDataModel());
+            return new ElementQualitiesTabController(getElementDataModel(), getQualityDataModel(), getPropertyDataModel());
         } else if (ElementFormController.class.equals(controllerClass)) {
             return new ElementFormController(getElementDataModel(), getQualityDataModel());
         } else if (ElementQualityFormController.class.equals(controllerClass)) {
@@ -162,6 +175,8 @@ public class App extends javafx.application.Application {
             return new PropertyFormController(getQualityDataModel(), getPropertyDataModel());
         } else if (PropertyUnitFormController.class.equals(controllerClass)) {
             return new PropertyUnitFormController(getPropertyDataModel());
+        } else if (PreviewController.class.equals(controllerClass)){
+            return new PreviewController();
         } else {
             LOGGER.error("Unknown controller: {}", controllerClass.getSimpleName());
             throw new IllegalArgumentException("Unknown controller: " + controllerClass.getSimpleName());
