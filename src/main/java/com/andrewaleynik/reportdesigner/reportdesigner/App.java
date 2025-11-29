@@ -27,32 +27,32 @@ public class App extends javafx.application.Application {
     private static final int STARTUP_HEIGHT = 1000;
 
     public static final class FxmlPaths {
-        public static final String MAIN = "/com/andrewaleynik/reportdesigner/reportdesigner/templates/Main.fxml";
+        public static final String MAIN = "/templates/Main.fxml";
         public static final String ADD_ROOT_ELEMENT_FORM =
-                "/com/andrewaleynik/reportdesigner/reportdesigner/templates/AddRootElementForm.fxml";
+                "/templates/AddRootElementForm.fxml";
         public static final String ADD_CHILD_ELEMENT_FORM =
-                "/com/andrewaleynik/reportdesigner/reportdesigner/templates/AddChildElementForm.fxml";
+                "/templates/AddChildElementForm.fxml";
         public static final String ADD_ELEMENT_TYPE_FORM =
-                "/com/andrewaleynik/reportdesigner/reportdesigner/templates/AddElementTypeForm.fxml";
+                "/templates/AddElementTypeForm.fxml";
         public static final String ADD_ELEMENT_QUALITY_SHORT_FORM =
-                "/com/andrewaleynik/reportdesigner/reportdesigner/templates/AddElementQualityShortForm.fxml";
+                "/templates/AddElementQualityShortForm.fxml";
         public static final String EDIT_ELEMENT_FORM =
-                "/com/andrewaleynik/reportdesigner/reportdesigner/templates/EditElementForm.fxml";
+                "/templates/EditElementForm.fxml";
         public static final String ADD_PROPERTY_FORM =
-                "/com/andrewaleynik/reportdesigner/reportdesigner/templates/AddPropertyForm.fxml";
+                "/templates/AddPropertyForm.fxml";
         public static final String ADD_PROPERTY_UNIT_FORM =
-                "/com/andrewaleynik/reportdesigner/reportdesigner/templates/AddPropertyUnitForm.fxml";
+                "/templates/AddPropertyUnitForm.fxml";
 
         public static final String EXPORT_PREVIEW =
-                "/com/andrewaleynik/reportdesigner/reportdesigner/templates/PdfPreview.fxml";
+                "/templates/PdfPreview.fxml";
         private FxmlPaths() {
         }
     }
 
     public static final class FontPaths {
-        public static final String ARIAL = "/com/andrewaleynik/reportdesigner/reportdesigner/fonts/arialmt.ttf";
+        public static final String ARIAL = "/fonts/arialmt.ttf";
         public static final String ARIAL_BOLD_ITALIC =
-                "/com/andrewaleynik/reportdesigner/reportdesigner/fonts/arialmt.ttf";
+                "/fonts/arialmt.ttf";
 
         private FontPaths(){}
     }
