@@ -8,6 +8,7 @@ import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.PropertyDataMo
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.*;
 import com.andrewaleynik.reportdesigner.reportdesigner.util.AlertFactory;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.HibernateSessionFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -23,8 +24,8 @@ public class App extends javafx.application.Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     private static final String APP_NAME = "Конструктор отчетов";
-    private static final int STARTUP_WIDTH = 750;
-    private static final int STARTUP_HEIGHT = 1000;
+    private static final int STARTUP_WIDTH = 600;
+    private static final int STARTUP_HEIGHT = 800;
 
     public static final class FxmlPaths {
         public static final String MAIN = "/templates/Main.fxml";
@@ -102,7 +103,15 @@ public class App extends javafx.application.Application {
         }
     }
 
+    @Override
+    public void stop() throws Exception {
+        LOGGER.info("App shutdown");
+        super.stop();
+        HibernateSessionFactory.shutdown();
+    }
+
     private void initializePrimaryStage(Stage primaryStage) throws IOException {
+
         FXMLLoader loader = createFxmlLoader(FxmlPaths.MAIN);
         Parent root = loader.load();
 
@@ -133,6 +142,8 @@ public class App extends javafx.application.Application {
     }
 
     public static void main(String[] args) {
+        LOGGER.info("Open DB connection...");
+        HibernateSessionFactory.getSessionFactory();
         LOGGER.info("Launching app...");
         try {
             launch(args);

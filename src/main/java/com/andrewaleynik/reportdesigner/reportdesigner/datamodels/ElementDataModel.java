@@ -23,6 +23,9 @@ public class ElementDataModel {
     public ElementDataModel(ElementService elementService, PdfExportService pdfExportService) {
         this.elementService = elementService;
         this.pdfExportService = pdfExportService;
+
+        refreshElementTypes();
+        refreshRootElements();
     }
 
     public ObservableList<Element> getElements() {

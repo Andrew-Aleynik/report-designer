@@ -20,9 +20,9 @@
         <mockito.version>5.8.0</mockito.version>
 
         <!-- Build settings -->
-        <maven.compiler.release>24</maven.compiler.release>
-        <maven.compiler.source>24</maven.compiler.source>
-        <maven.compiler.target>24</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
 
         <!-- JDK path (adjust per machine if needed) -->
         <java.home>/usr/lib/jvm/jdk-24.0.2-oracle-x64</java.home>
@@ -58,9 +58,15 @@
             <version>2.0.9</version>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.4.11</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.24.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.17.2</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- iTextPDF -->
@@ -160,9 +166,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.12.1</version>
                 <configuration>
-                    <source>24</source>
-                    <target>24</target>
-                    <release>24</release>
+                    <source>21</source>
+                    <target>21</target>
+                    <release>21</release>
 <!--                    <jdkHome>${java.home}</jdkHome>-->
                     <fork>true</fork>
                 </configuration>
@@ -215,6 +221,8 @@
             <properties>
                 <javafx.platform>linux</javafx.platform>
                 <jpackage.os>linux</jpackage.os>
+                <module.path.separator>:</module.path.separator>
+                <java.home>/usr/lib/jvm/jdk-24.0.2-oracle-x64</java.home>
             </properties>
             <dependencies>
                 <!-- JavaFX with linux classifier -->
@@ -291,7 +299,7 @@
                                         </copy>
                                         <exec executable="jlink" failonerror="true">
                                             <arg value="--module-path"/>
-                                            <arg value="${java.home}/jmods:${project.build.directory}/javafx-jmods"/>
+                                            <arg value="${java.home}/jmods${module.path.separator}${project.build.directory}/javafx-jmods"/>
                                             <arg value="--add-modules"/>
                                             <arg value="java.base,java.desktop,java.sql,java.naming,java.management,javafx.controls,javafx.fxml,javafx.swing,javafx.web"/>
                                             <arg value="--output"/>
@@ -337,6 +345,9 @@
             <properties>
                 <javafx.platform>win</javafx.platform>
                 <jpackage.os>windows</jpackage.os>
+                <module.path.separator>;</module.path.separator>
+                <java.home>C:\Program Files\Java\jdk-21</java.home>
+                <app.version>1.0.0</app.version>
             </properties>
             <dependencies>
                 <!-- JavaFX with win classifier -->
@@ -413,7 +424,7 @@
                                         </copy>
                                         <exec executable="jlink" failonerror="true">
                                             <arg value="--module-path"/>
-                                            <arg value="${java.home}/jmods:${project.build.directory}/javafx-jmods"/>
+                                            <arg value="${java.home}/jmods${module.path.separator}${project.build.directory}/javafx-jmods"/>
                                             <arg value="--add-modules"/>
                                             <arg value="java.base,java.desktop,java.sql,java.naming,java.management,javafx.controls,javafx.fxml,javafx.swing,javafx.web"/>
                                             <arg value="--output"/>
@@ -437,9 +448,9 @@
                                             <arg value="--dest"/>
                                             <arg value="${project.build.directory}/dist"/>
                                             <arg value="--vendor"/>
-                                            <arg value="AndrewAleyNik"/>
+                                            <arg value="Andrew"/>
                                             <arg value="--app-version"/>
-                                            <arg value="${project.version}"/>
+                                            <arg value="${app.version}"/>
                                         </exec>
                                     </target>
                                 </configuration>

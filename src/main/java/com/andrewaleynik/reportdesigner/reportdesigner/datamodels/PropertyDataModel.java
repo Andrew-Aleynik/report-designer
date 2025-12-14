@@ -19,6 +19,8 @@ public class PropertyDataModel {
 
     public PropertyDataModel(PropertyService propertyService) {
         this.propertyService = propertyService;
+
+        refreshPropertyUnits();
     }
 
     public Property getEditingProperty() {
