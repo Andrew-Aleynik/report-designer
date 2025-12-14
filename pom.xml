@@ -11,35 +11,26 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.8.2</junit.version>
 
+        <!-- Common versions -->
         <javafx.version>21</javafx.version>
         <h2.version>2.2.224</h2.version>
         <hibernate.version>6.3.1.Final</hibernate.version>
         <controlsfx.version>11.1.2</controlsfx.version>
-        <jfxtras.version>17-r1</jfxtras.version>
+        <mockito.version>5.8.0</mockito.version>
 
+        <!-- Build settings -->
+        <maven.compiler.release>24</maven.compiler.release>
+        <maven.compiler.source>24</maven.compiler.source>
+        <maven.compiler.target>24</maven.compiler.target>
 
+        <!-- JDK path (adjust per machine if needed) -->
+        <java.home>/usr/lib/jvm/jdk-24.0.2-oracle-x64</java.home>
     </properties>
 
+    <!-- === DEFAULT DEPENDENCIES (platform-independent) === -->
     <dependencies>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-swing</artifactId>
-            <version>21</version>
-        </dependency>
-
-        <!-- База данных - H2 (встроенная, файловая) -->
+        <!-- H2 -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -53,27 +44,26 @@
             <version>${hibernate.version}</version>
         </dependency>
 
-        <!-- Connection Pool -->
+        <!-- HikariCP -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>5.1.0</version>
         </dependency>
 
-        <!-- Логирование -->
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>2.0.9</version>
         </dependency>
-
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.4.11</version>
         </dependency>
 
-        <!-- Выгрузка в PDF -->
+        <!-- iTextPDF -->
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>kernel</artifactId>
@@ -85,34 +75,26 @@
             <version>7.2.5</version>
         </dependency>
 
-        <!-- Просмотр PDF -->
+        <!-- PDFBox -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>2.0.29</version>
         </dependency>
-
-        <!-- Для работы с изображениями (рендеринг PDF) -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox-tools</artifactId>
             <version>2.0.29</version>
         </dependency>
 
-        <!-- Расширенные контролы для JavaFX -->
+        <!-- ControlsFX -->
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
             <version>${controlsfx.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-
-        <!-- Иконки для JavaFX -->
+        <!-- Ikonli -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-javafx</artifactId>
@@ -124,7 +106,7 @@
             <version>12.3.1</version>
         </dependency>
 
-        <!-- Валидация -->
+        <!-- Validation -->
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
@@ -136,11 +118,19 @@
             <version>8.0.1.Final</version>
         </dependency>
 
-        <!-- Тесты -->
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.28</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Tests -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.9.2</version>
+            <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -152,16 +142,14 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.8.0</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
-
-
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.28</version>
-            <scope>compile</scope>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -170,13 +158,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.12.1</version>
                 <configuration>
+                    <source>24</source>
+                    <target>24</target>
                     <release>24</release>
-                    <executable>/usr/lib/jvm/jdk-24.0.2-oracle-x64/bin/javac</executable>
+<!--                    <jdkHome>${java.home}</jdkHome>-->
                     <fork>true</fork>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -200,89 +191,266 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <executions>
-                    <execution>
-                        <!-- Default configuration for running with: mvn clean javafx:run -->
-                        <id>default-cli</id>
-                        <configuration>
-                            <mainClass>
-                                com.andrewaleynik.reportdesigner.reportdesigner/com.andrewaleynik.reportdesigner.reportdesigner.App
-                            </mainClass>
-                            <commandlineArgs>
-                                --add-opens javafx.web/com.sun.webkit.WebPage=ALL-UNNAMED --enable-native-access=javafx.web
-                            </commandlineArgs>
-                            <launcher>app</launcher>
-                            <jlinkZipName>app</jlinkZipName>
-                            <jlinkImageName>app</jlinkImageName>
-                            <noManPages>true</noManPages>
-                            <stripDebug>true</stripDebug>
-                            <noHeaderFiles>true</noHeaderFiles>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.andrewaleynik.reportdesigner.reportdesigner.App</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                    <jvm>${java.home}/bin/java</jvm>
+                    <argLine>--enable-preview</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>
 
     <profiles>
+        <!-- =============== DEV: Linux =============== -->
         <profile>
-            <id>dev</id>
+            <id>dev-linux</id>
+            <activation>
+                <os><family>unix</family></os>
+            </activation>
             <properties>
-                <app.env>dev</app.env>
+                <javafx.platform>linux</javafx.platform>
+                <jpackage.os>linux</jpackage.os>
             </properties>
+            <dependencies>
+                <!-- JavaFX with linux classifier -->
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-fxml</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-swing</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-media</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-web</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-base</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+            </dependencies>
             <build>
                 <resources>
                     <resource>
                         <directory>src/main/resources</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/profile/dev</directory>
                         <includes>
-                            <include>log4j2-dev.xml</include>
+                            <include>hibernate.cfg.xml</include>
+                            <include>log4j.xml</include>
                         </includes>
-                        <targetPath>${project.build.outputDirectory}</targetPath>
                     </resource>
                 </resources>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <copy todir="${project.build.directory}/javafx-jmods" flatten="true">
+                                            <fileset dir="${settings.localRepository}">
+                                                <include name="org/openjfx/javafx-*/${javafx.version}/javafx-*-${javafx.version}-linux.jar"/>
+                                            </fileset>
+                                        </copy>
+                                        <exec executable="jlink" failonerror="true">
+                                            <arg value="--module-path"/>
+                                            <arg value="${java.home}/jmods:${project.build.directory}/javafx-jmods"/>
+                                            <arg value="--add-modules"/>
+                                            <arg value="java.base,java.desktop,java.sql,java.naming,java.management,javafx.controls,javafx.fxml,javafx.swing,javafx.web"/>
+                                            <arg value="--output"/>
+                                            <arg value="${project.build.directory}/runtime"/>
+                                            <arg value="--strip-debug"/>
+                                            <arg value="--compress=2"/>
+                                            <arg value="--no-header-files"/>
+                                            <arg value="--no-man-pages"/>
+                                        </exec>
+                                        <exec executable="jpackage" failonerror="true">
+                                            <arg value="--name"/>
+                                            <arg value="ReportDesigner"/>
+                                            <arg value="--input"/>
+                                            <arg value="${project.build.directory}"/>
+                                            <arg value="--main-jar"/>
+                                            <arg value="${project.build.finalName}.jar"/>
+                                            <arg value="--main-class"/>
+                                            <arg value="com.andrewaleynik.reportdesigner.reportdesigner.App"/>
+                                            <arg value="--runtime-image"/>
+                                            <arg value="${project.build.directory}/runtime"/>
+                                            <arg value="--dest"/>
+                                            <arg value="${project.build.directory}/dist"/>
+                                            <arg value="--vendor"/>
+                                            <arg value="AndrewAleyNik"/>
+                                            <arg value="--app-version"/>
+                                            <arg value="${project.version}"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
 
-<!--        <profile>-->
-<!--            <id>prod</id>-->
-<!--            <properties>-->
-<!--                <app.env>prod</app.env>-->
-<!--            </properties>-->
-<!--            <build>-->
-<!--                <resources>-->
-<!--                    <resource>-->
-<!--                        <directory>src/main/resources</directory>-->
-<!--                        <includes>-->
-<!--                            <include>log4j2-prod.xml</include>-->
-<!--                        </includes>-->
-<!--                        <targetPath>${project.build.outputDirectory}</targetPath>-->
-<!--                    </resource>-->
-<!--                </resources>-->
-<!--            </build>-->
-<!--        </profile>-->
+        <!-- =============== PROD: Windows =============== -->
+        <profile>
+            <id>prod-win</id>
+            <properties>
+                <javafx.platform>win</javafx.platform>
+                <jpackage.os>windows</jpackage.os>
+            </properties>
+            <dependencies>
+                <!-- JavaFX with win classifier -->
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-fxml</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-swing</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-media</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-web</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-base</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+            </dependencies>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/profile/prod</directory>
+                        <includes>
+                            <include>hibernate.cfg.xml</include>
+                            <include>log4j.xml</include>
+                        </includes>
+                    </resource>
+                </resources>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <copy todir="${project.build.directory}/javafx-jmods" flatten="true">
+                                            <fileset dir="${settings.localRepository}">
+                                                <include name="org/openjfx/javafx-*/${javafx.version}/javafx-*-${javafx.version}-win.jar"/>
+                                            </fileset>
+                                        </copy>
+                                        <exec executable="jlink" failonerror="true">
+                                            <arg value="--module-path"/>
+                                            <arg value="${java.home}/jmods:${project.build.directory}/javafx-jmods"/>
+                                            <arg value="--add-modules"/>
+                                            <arg value="java.base,java.desktop,java.sql,java.naming,java.management,javafx.controls,javafx.fxml,javafx.swing,javafx.web"/>
+                                            <arg value="--output"/>
+                                            <arg value="${project.build.directory}/runtime"/>
+                                            <arg value="--strip-debug"/>
+                                            <arg value="--compress=2"/>
+                                            <arg value="--no-header-files"/>
+                                            <arg value="--no-man-pages"/>
+                                        </exec>
+                                        <exec executable="jpackage" failonerror="true">
+                                            <arg value="--name"/>
+                                            <arg value="ReportDesigner"/>
+                                            <arg value="--input"/>
+                                            <arg value="${project.build.directory}"/>
+                                            <arg value="--main-jar"/>
+                                            <arg value="${project.build.finalName}.jar"/>
+                                            <arg value="--main-class"/>
+                                            <arg value="com.andrewaleynik.reportdesigner.reportdesigner.App"/>
+                                            <arg value="--runtime-image"/>
+                                            <arg value="${project.build.directory}/runtime"/>
+                                            <arg value="--dest"/>
+                                            <arg value="${project.build.directory}/dist"/>
+                                            <arg value="--vendor"/>
+                                            <arg value="AndrewAleyNik"/>
+                                            <arg value="--app-version"/>
+                                            <arg value="${project.version}"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

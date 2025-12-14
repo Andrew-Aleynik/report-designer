@@ -1,6 +1,9 @@
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.ElementDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.ElementQualityDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.ElementTypeDao;
+import com.andrewaleynik.reportdesigner.reportdesigner.dao.impl.ElementDaoImpl;
+import com.andrewaleynik.reportdesigner.reportdesigner.dao.impl.ElementQualityDaoImpl;
+import com.andrewaleynik.reportdesigner.reportdesigner.dao.impl.ElementTypeDaoImpl;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementType;
@@ -31,9 +34,9 @@ class ElementServiceImplTest {
 
     @BeforeAll
     static void init() {
-        elementDao = mock();
-        elementTypeDao = mock();
-        elementQualityDao = mock();
+        elementDao = mock(ElementDaoImpl.class);
+        elementTypeDao = mock(ElementTypeDaoImpl.class);
+        elementQualityDao = mock(ElementQualityDaoImpl.class);
         elementService = new ElementServiceImpl(elementDao, elementTypeDao);
     }
 
