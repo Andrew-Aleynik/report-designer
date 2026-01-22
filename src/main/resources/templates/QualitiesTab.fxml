@@ -8,17 +8,17 @@
 
     <!-- Панель управления -->
     <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Качества:"/>
+        <Label text="Потребительские качества:"/>
         <ComboBox fx:id="elementQualitiesComboBox" prefWidth="200"/>
-        <Button text="Добавить качество" onAction="#handleCreateElementQuality"/>
+        <Button text="Выбор условий" onAction="#handleCreateElementQuality"/>
     </HBox>
 
     <!-- Редактирование качества -->
     <VBox spacing="15" style="-fx-border-color: #cccccc; -fx-border-width: 1; -fx-padding: 15;">
-        <Label text="Редактирование качества" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+        <Label text="Выбор условий потребительского качества:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
         <GridPane hgap="10" vgap="10">
-            <Label text="Связан с :" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label text="Связан с:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
             <Label fx:id="elementNameField" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="200"/>
 
             <Label text="Код:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
@@ -30,7 +30,7 @@
                 <Label text="дней"/>
             </HBox>
 
-            <Label text="Удовлетворяющая стоимость:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <Label text="Граничное условие:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
             <TextField fx:id="satisfyingCostField" GridPane.rowIndex="3" GridPane.columnIndex="1" prefWidth="200" promptText="0.00"/>
 
             <Label text="Фактическая стоимость:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
@@ -40,7 +40,7 @@
         <!-- Свойства качества -->
         <VBox spacing="10">
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Свойства качества" style="-fx-font-weight: bold;"/>
+                <Label text="Потребительские свойства" style="-fx-font-weight: bold;"/>
                 <Button text="Добавить свойство" onAction="#showAddPropertyForm"/>
             </HBox>
 

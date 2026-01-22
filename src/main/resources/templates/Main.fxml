@@ -7,12 +7,17 @@
          tabClosingPolicy="UNAVAILABLE">
 
     <!-- Первая вкладка - Дерево элементов -->
-    <Tab text="Дерево элементов">
+    <Tab text="Структурная модель объекта">
         <fx:include source="ElementsTreeTab.fxml"/>
     </Tab>
 
     <!-- Вторая вкладка - Редактирование качеств и свойств -->
-    <Tab text="Качества">
+    <Tab text="Потребительские качества">
         <fx:include source="QualitiesTab.fxml"/>
+    </Tab>
+
+    <!-- Третья вкладка - Внешние воздействия -->
+    <Tab text="Внешние воздействия">
+        <fx:include source="ExternalInfluenceTab.fxml"/>
     </Tab>
 </TabPane>

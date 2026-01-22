@@ -14,7 +14,7 @@
     <HBox spacing="10" alignment="CENTER_LEFT">
         <Label text="Корневые элементы:"/>
         <ComboBox fx:id="rootElementsComboBox" prefWidth="200"/>
-        <Button text="Добавить корневой элемент" onAction="#showAddRootElementForm"/>
+        <Button text="Добавить новую модель" onAction="#showAddRootElementForm"/>
     </HBox>
 
     <!-- Дерево элементов -->

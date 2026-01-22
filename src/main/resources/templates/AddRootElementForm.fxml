@@ -7,7 +7,7 @@
       fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementFormController"
       spacing="20" style="-fx-padding: 20;">
 
-    <Label text="Добавление корневого элемента" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Добавление структурной модели" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
     <GridPane hgap="10" vgap="10">
         <Label text="Код:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>

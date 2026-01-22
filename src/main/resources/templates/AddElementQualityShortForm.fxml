@@ -7,7 +7,7 @@
       fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementQualityFormController"
       spacing="20" style="-fx-padding: 20;">
 
-    <Label text="Добавление качества" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Добавление потребительского качества" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
     <GridPane hgap="10" vgap="10">
         <Label text="Код:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
