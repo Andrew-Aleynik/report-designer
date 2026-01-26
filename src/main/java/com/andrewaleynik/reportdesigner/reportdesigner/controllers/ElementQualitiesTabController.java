@@ -146,7 +146,7 @@ public class ElementQualitiesTabController {
             }
         });
 
-        TableColumn<Property, String> currentValueColumn = new TableColumn<>("Текущее значение");
+        TableColumn<Property, String> currentValueColumn = new TableColumn<>("Показатель потребительского качества");
         currentValueColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getCurrentValue()));
         currentValueColumn.setCellFactory(column -> new TableCell<Property, String>() {
@@ -162,7 +162,7 @@ public class ElementQualitiesTabController {
         });
 
 
-        TableColumn<Property, String> criterionValueColumn = new TableColumn<>("Критерий качества");
+        TableColumn<Property, String> criterionValueColumn = new TableColumn<>("Критерий потребительского качества");
         criterionValueColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getQualityCriterionValue()));
         criterionValueColumn.setCellFactory(column -> new TableCell<Property, String>() {
@@ -275,7 +275,7 @@ public class ElementQualitiesTabController {
             ElementQualityFormController controller = loader.getController();
 
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Добавление нового качества");
+            dialogStage.setTitle("Добавление потребительского качества");
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.initOwner(elementQualitiesComboBox.getScene().getWindow());
             dialogStage.setScene(new Scene(root));
@@ -352,7 +352,7 @@ public class ElementQualitiesTabController {
             PropertyFormController controller = loader.getController();
 
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Добавление свойства");
+            dialogStage.setTitle("Добавление потребительского свойства");
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.initOwner(propertiesTableView.getScene().getWindow());
             dialogStage.setScene(new Scene(root));
@@ -382,7 +382,7 @@ public class ElementQualitiesTabController {
             PropertyFormController controller = loader.getController();
 
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Добавление свойства");
+            dialogStage.setTitle("Редактирование потребительского свойства");
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.initOwner(propertiesTableView.getScene().getWindow());
             dialogStage.setScene(new Scene(root));

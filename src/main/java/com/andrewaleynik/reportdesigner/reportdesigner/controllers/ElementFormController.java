@@ -189,7 +189,7 @@ public class ElementFormController {
             ElementQualityFormController controller = loader.getController();
 
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Добавление нового качества");
+            dialogStage.setTitle("Добавление потребительского качества");
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.initOwner(qualityComboBox.getScene().getWindow());
             dialogStage.setScene(new Scene(root));

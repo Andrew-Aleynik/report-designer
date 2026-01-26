@@ -10,7 +10,7 @@
     <HBox spacing="10" alignment="CENTER_LEFT">
         <Label text="Потребительские качества:"/>
         <ComboBox fx:id="elementQualitiesComboBox" prefWidth="200"/>
-        <Button text="Выбор условий" onAction="#handleCreateElementQuality"/>
+        <Button text="Добавить потребительское качество" onAction="#handleCreateElementQuality"/>
     </HBox>
 
     <!-- Редактирование качества -->

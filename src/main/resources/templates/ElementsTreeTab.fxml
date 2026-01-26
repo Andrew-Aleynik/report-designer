@@ -12,7 +12,7 @@
       fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.ElementsTreeTabController">
     <!-- Панель управления -->
     <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Корневые элементы:"/>
+        <Label text="Структурные модели:"/>
         <ComboBox fx:id="rootElementsComboBox" prefWidth="200"/>
         <Button text="Добавить новую модель" onAction="#showAddRootElementForm"/>
     </HBox>

@@ -213,7 +213,7 @@ public class ElementsTreeTabController {
             ElementFormController controller = loader.getController();
 
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Добавление корневого элемента");
+            dialogStage.setTitle("Добавление структурной модели");
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.initOwner(rootElementsComboBox.getScene().getWindow());
             dialogStage.setScene(new Scene(root));
@@ -230,6 +230,11 @@ public class ElementsTreeTabController {
             LOGGER.error("Error opening form: {}", e.getMessage(), e);
             AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
         }
+    }
+
+    @FXML
+    public void showElementQualitiesExternalInfluencesFlagTable() {
+
     }
 
     @FXML

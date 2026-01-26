@@ -136,7 +136,7 @@ public class PreviewController {
     private String generateDefaultFileName() {
         String timestamp = java.time.LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
-        return "отчет_элементы_" + timestamp + ".pdf";
+        return "отчет_" + timestamp + ".pdf";
     }
 
     private void cleanupTempFile() {
