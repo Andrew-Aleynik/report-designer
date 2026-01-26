@@ -4,6 +4,7 @@ import com.andrewaleynik.reportdesigner.reportdesigner.controllers.*;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.*;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.impl.*;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ElementDataModel;
+import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ExternalInfluencesDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.PropertyDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.*;
@@ -42,9 +43,14 @@ public class App extends javafx.application.Application {
                 "/templates/AddPropertyForm.fxml";
         public static final String ADD_PROPERTY_UNIT_FORM =
                 "/templates/AddPropertyUnitForm.fxml";
-
         public static final String EXPORT_PREVIEW =
                 "/templates/PdfPreview.fxml";
+        public static final String ADD_EXTERNAL_INFLUENCE_FORM =
+                "/templates/ExternalInfluenceForm.fxml";
+        public static final String EDIT_EXTERNAL_INFLUENCE_FORM =
+                "/templates/ExternalInfluenceForm.fxml";
+
+
         private FxmlPaths() {
         }
     }
@@ -54,12 +60,15 @@ public class App extends javafx.application.Application {
         public static final String ARIAL_BOLD_ITALIC =
                 "/fonts/arialmt.ttf";
 
-        private FontPaths(){}
+        private FontPaths() {
+        }
     }
 
     private static final ElementDataModel elementDataModel;
     private static final QualityDataModel qualityDataModel;
     private static final PropertyDataModel propertyDataModel;
+
+    private static final ExternalInfluencesDataModel externalInfluencesDataModel;
 
     static {
         LOGGER.info("Components initialization...");
@@ -70,6 +79,7 @@ public class App extends javafx.application.Application {
             ElementTypeDao elementTypeDao = new ElementTypeDaoImpl();
             PropertyDao propertyDao = new PropertyDaoImpl();
             PropertyUnitDao propertyUnitDao = new PropertyUnitDaoImpl();
+            ExternalInfluenceDao externalInfluenceDao = new ExternalInfluenceDaoImpl();
 
             ElementService elementService = new ElementServiceImpl(elementDao, elementTypeDao);
             ElementQualityService elementQualityService =
@@ -78,10 +88,12 @@ public class App extends javafx.application.Application {
             PdfExportService pdfExportService = new PdfExportService(
                     new ElementsTreePdfExportService()
             );
+            ExternalInfluenceService externalInfluenceService = new ExternalInfluenceServiceImpl(externalInfluenceDao);
 
             elementDataModel = new ElementDataModel(elementService, pdfExportService);
             qualityDataModel = new QualityDataModel(elementQualityService);
             propertyDataModel = new PropertyDataModel(propertyService);
+            externalInfluencesDataModel = new ExternalInfluencesDataModel(externalInfluenceService);
 
             LOGGER.info("Components were initialized");
         } catch (Exception e) {
@@ -132,6 +144,10 @@ public class App extends javafx.application.Application {
         return propertyDataModel;
     }
 
+    public static ExternalInfluencesDataModel getExternalInfluencesDataModel() {
+        return externalInfluencesDataModel;
+    }
+
     public static void main(String[] args) {
         LOGGER.info("Launching app...");
         try {
@@ -175,8 +191,12 @@ public class App extends javafx.application.Application {
             return new PropertyFormController(getQualityDataModel(), getPropertyDataModel());
         } else if (PropertyUnitFormController.class.equals(controllerClass)) {
             return new PropertyUnitFormController(getPropertyDataModel());
-        } else if (PreviewController.class.equals(controllerClass)){
+        } else if (PreviewController.class.equals(controllerClass)) {
             return new PreviewController();
+        } else if (ExternalInfluencesTabController.class.equals(controllerClass)) {
+            return new ExternalInfluencesTabController(getExternalInfluencesDataModel());
+        } else if (ExternalInfluenceFormController.class.equals(controllerClass)) {
+            return new ExternalInfluenceFormController(getExternalInfluencesDataModel());
         } else {
             LOGGER.error("Unknown controller: {}", controllerClass.getSimpleName());
             throw new IllegalArgumentException("Unknown controller: " + controllerClass.getSimpleName());
