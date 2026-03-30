@@ -1,11 +1,10 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.models;
 
+import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
-
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Entity
@@ -14,9 +13,13 @@ public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "quality_id")
-    private ElementQuality quality;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "quality_property",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "quality_id")
+    )
+    private Set<ElementQuality> qualities = new HashSet<>();
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "unit_id", foreignKey = @ForeignKey(name = "fk_unit_id"))
     private PropertyUnit unit;
@@ -36,12 +39,40 @@ public class Property {
         this.unit = unit;
     }
 
-    public ElementQuality getQuality() {
-        return quality;
+    public Set<ElementQuality> getQualities() {
+        return qualities;
     }
 
-    public void setQuality(ElementQuality quality) {
-        this.quality = quality;
+    void internalAddQuality(ElementQuality quality) {
+        this.qualities.add(quality);
+    }
+
+    void internalRemoveQuality(ElementQuality quality) {
+        this.qualities.remove(quality);
+    }
+
+    public void addQuality(ElementQuality quality) {
+        if (!qualities.contains(quality)) {
+            qualities.add(quality);
+            quality.internalAddProperty(this);
+        }
+    }
+
+    public void removeQuality(ElementQuality quality) {
+        if (qualities.contains(quality)) {
+            qualities.remove(quality);
+            quality.internalRemoveProperty(this);
+        }
+    }
+
+    public void setQualities(Set<ElementQuality> newQualities) {
+        Set<ElementQuality> toRemove = new HashSet<>(this.qualities);
+        toRemove.removeAll(newQualities);
+        toRemove.forEach(this::removeQuality);
+
+        Set<ElementQuality> toAdd = new HashSet<>(newQualities);
+        toAdd.removeAll(this.qualities);
+        toAdd.forEach(this::addQuality);
     }
 
     public String getCurrentValue() {
@@ -62,25 +93,33 @@ public class Property {
 
     @Override
     public String toString() {
-        return "Property{" +
-                "id=" + id +
-                ", quality=" + Optional.ofNullable(quality.getCode()).orElse("") +
-                ", unit=" + unit +
-                ", currentValue='" + currentValue + '\'' +
-                ", qualityCriterionValue='" + qualityCriterionValue + '\'' +
-                '}';
+        String qualitiesString = qualities.stream()
+                .map(quality -> Optional.ofNullable(quality.getCode()).orElse(""))
+                .collect(Collectors.joining(",", "(", ")"));
+        return new StringJoiner(", ", "Property{", "}")
+                .add("id=" + id)
+                .add("qualities=" + qualitiesString)
+                .add("unit=" + unit)
+                .add("currentValue=" + currentValue)
+                .add("qualityCriterionValue=" + qualityCriterionValue)
+                .toString();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Property property = (Property) o;
-        return Objects.equals(id, property.id);
+        if (!(o instanceof Property property)) return false;
+        if (id != null && property.id != null) {
+            return id.equals(property.id);
+        }
+        return Objects.equals(qualities, property.qualities)
+                && Objects.equals(unit, property.unit)
+                && Objects.equals(currentValue, property.currentValue)
+                && Objects.equals(qualityCriterionValue, property.qualityCriterionValue);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(qualities, unit, currentValue, qualityCriterionValue);
     }
 }

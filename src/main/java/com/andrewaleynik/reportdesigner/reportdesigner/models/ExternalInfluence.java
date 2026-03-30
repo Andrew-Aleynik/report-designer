@@ -1,10 +1,10 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.models;
 
+import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
-
 import java.util.Objects;
+import java.util.StringJoiner;
 
 @NoArgsConstructor
 @Entity
@@ -39,22 +39,25 @@ public class ExternalInfluence {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ExternalInfluence that = (ExternalInfluence) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+        if (!(o instanceof ExternalInfluence externalInfluence)) return false;
+        if (id != null && externalInfluence.id != null) {
+            return id.equals(externalInfluence.id);
+        }
+        return Objects.equals(name, externalInfluence.name)
+                && Objects.equals(description, externalInfluence.description);
     }
 
     @Override
     public String toString() {
-        return "ExternalInfluence{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+        return new StringJoiner(", ", "ExternalInfluence{", "}")
+                .add("id=" + id)
+                .add("name=" + name)
+                .add("description=" + description)
+                .toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description);
     }
 }

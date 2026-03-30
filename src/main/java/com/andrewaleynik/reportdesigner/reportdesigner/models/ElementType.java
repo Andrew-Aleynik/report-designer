@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.NoArgsConstructor;
 
 import java.util.Objects;
+import java.util.StringJoiner;
 
 @NoArgsConstructor
 @Entity
@@ -33,17 +34,21 @@ public class ElementType {
     }
 
     @Override
+    public String toString() {
+        return new StringJoiner(", ", "ElementType{", "}")
+                .add("id=" + id)
+                .add("name=" + name)
+                .toString();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ElementType type = (ElementType) o;
-
-        if (id != null && type.id != null) {
-            return id.equals(type.id);
+        if (!(o instanceof ElementType elementType)) return false;
+        if (id != null && elementType.id != null) {
+            return id.equals(elementType.id);
         }
-
-        return name.equals(type.name);
+        return name.equals(elementType.name);
     }
 
     @Override

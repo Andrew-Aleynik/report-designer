@@ -1,10 +1,10 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.models;
 
+import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
-
 import java.util.Objects;
+import java.util.StringJoiner;
 
 @NoArgsConstructor
 @Entity
@@ -29,18 +29,20 @@ public class PropertyUnit {
 
     @Override
     public String toString() {
-        return "PropertyUnit{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
+        return new StringJoiner(", ", "PropertyUnit{", "}")
+                .add("id=" + id)
+                .add("name=" + name)
+                .toString();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PropertyUnit that = (PropertyUnit) o;
-        return name.equals(that.name);
+        if (!(o instanceof PropertyUnit propertyUnit)) return false;
+        if (id != null && propertyUnit.id != null) {
+            return id.equals(propertyUnit.id);
+        }
+        return Objects.equals(name, propertyUnit.name);
     }
 
     @Override
