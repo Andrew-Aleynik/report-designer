@@ -160,16 +160,16 @@ public class ElementFormController {
             Parent root = loader.load();
             ElementTypeFormController controller = loader.getController();
 
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Добавление нового типа");
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.initOwner(typeComboBox.getScene().getWindow());
-            dialogStage.setScene(new Scene(root));
-            dialogStage.setResizable(false);
+            Stage dialogStageChild = new Stage();
+            dialogStageChild.setTitle("Добавление нового типа");
+            dialogStageChild.initModality(Modality.APPLICATION_MODAL);
+            dialogStageChild.initOwner(typeComboBox.getScene().getWindow());
+            dialogStageChild.setScene(new Scene(root));
+            dialogStageChild.setResizable(false);
 
             controller.setDialogStage(dialogStage);
 
-            dialogStage.showAndWait();
+            dialogStageChild.showAndWait();
 
             if (controller.isSaved()) {
                 typeComboBox.getSelectionModel().select(elementDataModel.getNewElementType());
@@ -213,7 +213,7 @@ public class ElementFormController {
         ElementType type = typeComboBox.getValue();
         String name = nameField.getText();
 
-        return code == null || code.trim().isEmpty() || code.trim().length() < 3 ||
+        return code == null || code.trim().length() < 3 ||
                 type == null ||
                 name == null || name.trim().isEmpty();
     }
