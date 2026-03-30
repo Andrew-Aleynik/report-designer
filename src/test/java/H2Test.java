@@ -9,7 +9,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class H2Test extends BaseTest {
@@ -155,6 +154,7 @@ class H2Test extends BaseTest {
         property.setUnit(unit);
         quality.addProperty(property);
         elementQualityDao.save(quality);
+        propertyDao.save(property);
 
         Optional<ElementQuality> foundQualityOptional = elementQualityDao.findById(quality.getId());
         assertThat(foundQualityOptional).isPresent();
@@ -163,7 +163,7 @@ class H2Test extends BaseTest {
         assertThat(foundQuality.getServiceLife().toDays()).isEqualTo(3650);
         assertThat(foundQuality.getSatisfyingCost()).isEqualByComparingTo("100000.00");
 
-        Property foundProperty = foundQuality.getProperties().get(0);
+        Property foundProperty = foundQuality.getProperties().iterator().next();
         assertThat(foundProperty.getUnit().getName()).isEqualTo("шт.");
         assertThat(foundProperty.getCurrentValue()).isEqualTo("100");
         assertThat(foundProperty.getQualityCriterionValue()).isEqualTo("200");
