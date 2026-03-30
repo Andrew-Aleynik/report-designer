@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class App extends javafx.application.Application {
-    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+    private static final Logger log = LoggerFactory.getLogger(App.class);
 
     private static final String APP_NAME = "Конструктор отчетов";
     private static final int STARTUP_WIDTH = 750;
@@ -49,7 +49,8 @@ public class App extends javafx.application.Application {
                 "/templates/ExternalInfluenceForm.fxml";
         public static final String EDIT_EXTERNAL_INFLUENCE_FORM =
                 "/templates/ExternalInfluenceForm.fxml";
-
+        public static final String INHERIT_PROPERTY_FORM =
+                "/templates/InheritPropertyForm.fxml";
 
         private FxmlPaths() {
         }
@@ -71,7 +72,7 @@ public class App extends javafx.application.Application {
     private static final ExternalInfluencesDataModel externalInfluencesDataModel;
 
     static {
-        LOGGER.info("Components initialization...");
+        log.info("Components initialization...");
 
         try {
             ElementDao elementDao = new ElementDaoImpl();
@@ -92,12 +93,12 @@ public class App extends javafx.application.Application {
 
             elementDataModel = new ElementDataModel(elementService, pdfExportService);
             qualityDataModel = new QualityDataModel(elementQualityService);
-            propertyDataModel = new PropertyDataModel(propertyService);
+            propertyDataModel = new PropertyDataModel(elementService, elementQualityService, propertyService);
             externalInfluencesDataModel = new ExternalInfluencesDataModel(externalInfluenceService);
 
-            LOGGER.info("Components were initialized");
+            log.info("Components were initialized");
         } catch (Exception e) {
-            LOGGER.error("Components initialization error: {}", e.getMessage(), e);
+            log.error("Components initialization error: {}", e.getMessage(), e);
             throw new RuntimeException("Не удалось инициализировать приложение", e);
         }
     }
@@ -106,9 +107,9 @@ public class App extends javafx.application.Application {
     public void start(Stage primaryStage) {
         try {
             initializePrimaryStage(primaryStage);
-            LOGGER.info("App started successful");
+            log.info("App started successful");
         } catch (Exception e) {
-            LOGGER.error("Starting critical error: {}", e.getMessage(), e);
+            log.error("Starting critical error: {}", e.getMessage(), e);
             AlertFactory.showError("Ошибка запуска", "Не удалось запустить приложение");
             System.exit(1);
         }
@@ -149,13 +150,13 @@ public class App extends javafx.application.Application {
     }
 
     public static void main(String[] args) {
-        LOGGER.info("Launching app...");
+        log.info("Launching app...");
         try {
             launch(args);
         } catch (Exception e) {
-            LOGGER.error("Critical exception: {}", e.getMessage(), e);
+            log.error("Critical exception: {}", e.getMessage(), e);
         } finally {
-            LOGGER.info("App was shut down");
+            log.info("App was shut down");
         }
     }
 
@@ -168,14 +169,14 @@ public class App extends javafx.application.Application {
             try {
                 return instantiateController(controllerClass);
             } catch (Exception e) {
-                LOGGER.error("Can't instantiate controller {}: {}", controllerClass.getSimpleName(), e.getMessage(), e);
+                log.error("Can't instantiate controller {}: {}", controllerClass.getSimpleName(), e.getMessage(), e);
                 throw new InstantiationError("Can't instantiate controller: " + controllerClass.getSimpleName());
             }
         };
     }
 
     private static Object instantiateController(Class<?> controllerClass) {
-        LOGGER.debug("Try instantiate controller: {}", controllerClass.getSimpleName());
+        log.debug("Try instantiate controller: {}", controllerClass.getSimpleName());
 
         if (ElementsTreeTabController.class.equals(controllerClass)) {
             return new ElementsTreeTabController(getElementDataModel());
@@ -197,8 +198,10 @@ public class App extends javafx.application.Application {
             return new ExternalInfluencesTabController(getExternalInfluencesDataModel());
         } else if (ExternalInfluenceFormController.class.equals(controllerClass)) {
             return new ExternalInfluenceFormController(getExternalInfluencesDataModel());
+        } else if (InheritPropertyFormController.class.equals(controllerClass)) {
+            return new InheritPropertyFormController(getQualityDataModel(), getPropertyDataModel());
         } else {
-            LOGGER.error("Unknown controller: {}", controllerClass.getSimpleName());
+            log.error("Unknown controller: {}", controllerClass.getSimpleName());
             throw new IllegalArgumentException("Unknown controller: " + controllerClass.getSimpleName());
         }
     }

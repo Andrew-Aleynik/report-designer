@@ -4,9 +4,11 @@ import com.andrewaleynik.reportdesigner.reportdesigner.App;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ElementDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.PropertyDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataModel;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Property;
 import com.andrewaleynik.reportdesigner.reportdesigner.util.AlertFactory;
+import jakarta.transaction.Transactional;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,6 +35,8 @@ public class ElementQualitiesTabController {
     private final PropertyDataModel propertyDataModel;
     @FXML
     private ComboBox<ElementQuality> elementQualitiesComboBox;
+    @FXML
+    private Label elementNameField;
     @FXML
     private TextField codeField;
     @FXML
@@ -230,6 +234,8 @@ public class ElementQualitiesTabController {
     private void populateFormWithQualityData() {
         ElementQuality quality = qualityDataModel.getSelectedQuality();
         if (quality != null) {
+            Optional<Element> elementOptional = elementDataModel.findElementByQuality(quality);
+            elementOptional.ifPresent(element -> elementNameField.setText(element.getName()));
             codeField.setText(Optional.ofNullable(quality.getCode()).orElse(""));
 
             serviceLifeDaysField.setText(
@@ -318,7 +324,6 @@ public class ElementQualitiesTabController {
             } catch (NumberFormatException e) {
                 quality.setActualCost(null);
             }
-            quality.setProperties(propertiesTableView.getItems());
             qualityDataModel.updateQuality(quality);
             qualityDataModel.refreshSelectedQuality(quality);
             elementDataModel.refreshRootElements();
@@ -334,7 +339,7 @@ public class ElementQualitiesTabController {
         qualityDataModel.refreshQualities();
         qualityDataModel.refreshSelectedQuality(null);
         populateFormWithQualityData();
-        propertyDataModel.refreshCurrentProperties(Collections.emptyList());
+        propertyDataModel.refreshCurrentProperties(Collections.emptySet());
         isSaved = true;
         updateSaveButtonState();
         updateDeleteButtonState();
@@ -363,6 +368,42 @@ public class ElementQualitiesTabController {
             dialogStage.showAndWait();
 
             isSaved = false;
+            propertyDataModel.refreshCurrentProperties(qualityDataModel.getSelectedQuality().getProperties());
+            updateSaveButtonState();
+            updateDeleteButtonState();
+        } catch (IOException e) {
+            LOGGER.error("Error opening form: {}", e.getMessage(), e);
+            AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
+        }
+    }
+
+    @FXML
+    public void showInheritPropertyForm() {
+        try {
+            qualityDataModel.refreshSelectedQuality(elementQualitiesComboBox.getValue());
+            propertyDataModel.refreshEditingProperty(null);
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.FxmlPaths.INHERIT_PROPERTY_FORM));
+            loader.setControllerFactory(App.getControllerFactory());
+            Parent root = loader.load();
+            InheritPropertyFormController controller = loader.getController();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Наследование потребительских свойств");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(propertiesTableView.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+
+            controller.setDialogStage(dialogStage);
+
+            dialogStage.showAndWait();
+
+            isSaved = true;
+            if (controller.isSaved()) {
+                propertyDataModel.refreshCurrentProperties(qualityDataModel.getSelectedQuality().getProperties());
+                isSaved = false;
+            }
             updateSaveButtonState();
             updateDeleteButtonState();
         } catch (IOException e) {
@@ -391,12 +432,14 @@ public class ElementQualitiesTabController {
             controller.setDialogStage(dialogStage);
 
             dialogStage.showAndWait();
+            propertyDataModel.refreshCurrentProperties(qualityDataModel.getSelectedQuality().getProperties());
         } catch (IOException e) {
             LOGGER.error("Error opening form: {}", e.getMessage(), e);
             AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
         }
     }
 
+    @Transactional
     private void handleDeleteProperty(Property property) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Подтверждение удаления");
@@ -405,11 +448,9 @@ public class ElementQualitiesTabController {
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                ElementQuality currentQuality = elementQualitiesComboBox.getValue();
-                if (currentQuality != null) {
-                    currentQuality.removeProperty(property);
-                    propertyDataModel.deleteProperty(property);
-                }
+                ElementQuality currentQuality = qualityDataModel.getSelectedQuality();
+                currentQuality.removeProperty(property);
+                propertyDataModel.refreshCurrentProperties(currentQuality.getProperties());
             }
         });
     }
@@ -423,7 +464,7 @@ public class ElementQualitiesTabController {
 
     private boolean isCodeInvalid() {
         String code = codeField.getText();
-        return code == null || code.trim().isEmpty() || code.trim().length() < 3;
+        return code == null || code.trim().length() < 3;
     }
 
     private boolean isServiceLifeInvalid() {

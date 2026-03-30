@@ -1,6 +1,7 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.datamodels;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementType;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementService;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.PdfExportService;
@@ -8,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.File;
+import java.util.Optional;
 
 public class ElementDataModel {
     private final ObservableList<Element> elements = FXCollections.observableArrayList();
@@ -103,5 +105,9 @@ public class ElementDataModel {
 
     public File exportElementsTreeToPdf(Element root) {
         return pdfExportService.exportElementsTree(root);
+    }
+
+    public Optional<Element> findElementByQuality(ElementQuality quality) {
+        return elementService.findElementByQualityId(quality.getId());
     }
 }

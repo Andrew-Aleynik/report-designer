@@ -168,7 +168,7 @@ public class PropertyFormController {
 
     private void createNewProperty() {
         Property property = new Property();
-        property.setQuality(qualityDataModel.getSelectedQuality());
+        property.addQuality(qualityDataModel.getSelectedQuality());
         property.setCurrentValue(
                 Optional.ofNullable(currentValueField.getText())
                         .orElse("")
@@ -191,7 +191,7 @@ public class PropertyFormController {
                         .orElse("")
         );
         editingProperty.setUnit(unitComboBox.getValue());
-        propertyDataModel.updateProperty(editingProperty);
+        propertyDataModel.updateProperty(qualityDataModel.getSelectedQuality(), editingProperty);
     }
 
     private void closeDialog() {

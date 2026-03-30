@@ -42,6 +42,7 @@
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Потребительские свойства" style="-fx-font-weight: bold;"/>
                 <Button text="Добавить свойство" onAction="#showAddPropertyForm"/>
+                <Button text="Наследование" onAction="#showInheritPropertyForm"/>
             </HBox>
 
             <TableView fx:id="propertiesTableView" prefHeight="200">
