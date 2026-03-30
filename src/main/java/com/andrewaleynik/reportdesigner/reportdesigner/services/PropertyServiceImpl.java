@@ -35,8 +35,8 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public List<Property> getPropertiesOf(ElementQuality quality) {
         return propertyDao.findAll().stream()
-                .filter(property -> property.getQuality().equals(quality))
-                .collect(Collectors.toList());
+                .filter(property -> property.getQualities().contains(quality))
+                .toList();
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.andrewaleynik.reportdesigner.reportdesigner.dao.ElementQualityDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyUnitDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
-import com.andrewaleynik.reportdesigner.reportdesigner.models.Property;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +20,6 @@ public class ElementQualityServiceImpl implements ElementQualityService {
         this.propertyUnitDao = propertyUnitDao;
 
     }
-
 
     @Override
     public List<ElementQuality> getAllQualities() {
@@ -42,6 +40,7 @@ public class ElementQualityServiceImpl implements ElementQualityService {
     public void deleteQuality(ElementQuality elementQuality) {
         elementQualityDao.delete(elementQuality);
     }
+
     @Override
     public void updateQuality(ElementQuality elementQuality) {
         elementQualityDao.update(elementQuality);

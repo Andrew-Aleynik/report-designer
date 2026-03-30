@@ -70,6 +70,13 @@ public class ElementServiceImpl implements ElementService {
     }
 
     @Override
+    public Optional<Element> findElementByQualityId(Long qualityId) {
+        return elementDao.findAll().stream()
+                .filter(element -> element.getQuality().getId().equals(qualityId))
+                .findFirst();
+    }
+
+    @Override
     public void saveElement(Element element) {
         if (element == null) {
             throw new IllegalArgumentException("Element must be present!");

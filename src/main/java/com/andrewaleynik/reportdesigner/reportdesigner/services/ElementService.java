@@ -11,12 +11,16 @@ public interface ElementService {
     TreeSet<Element> getElementsTree(Element rootElement);
 
     List<Element> getAllElements();
+
     List<Element> getRootElements();
 
     List<ElementType> getAllElementTypes();
+
     void saveElementType(ElementType elementType);
 
     Optional<Element> findElementById(Long id);
+
+    Optional<Element> findElementByQualityId(Long qualityId);
 
     void saveElement(Element element);
 
