@@ -22,7 +22,12 @@ public class ElementQuality {
     @Size(min = 3, max = 50, message = "Code must be between 3 and 50 characters")
     @Column(unique = true, nullable = false)
     private String code;
-    @ManyToMany(mappedBy = "qualities", fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "quality_property",
+            joinColumns = @JoinColumn(name = "quality_id"),
+            inverseJoinColumns = @JoinColumn(name = "property_id")
+    )
     private Set<Property> properties = new HashSet<>();
     private Duration serviceLife;
     private BigDecimal satisfyingCost;

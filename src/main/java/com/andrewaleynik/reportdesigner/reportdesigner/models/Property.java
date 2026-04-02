@@ -13,12 +13,7 @@ public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "quality_property",
-            joinColumns = @JoinColumn(name = "property_id"),
-            inverseJoinColumns = @JoinColumn(name = "quality_id")
-    )
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "properties")
     private Set<ElementQuality> qualities = new HashSet<>();
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "unit_id", foreignKey = @ForeignKey(name = "fk_unit_id"))
