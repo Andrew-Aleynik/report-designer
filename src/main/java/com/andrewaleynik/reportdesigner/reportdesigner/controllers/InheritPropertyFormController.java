@@ -124,7 +124,7 @@ public class InheritPropertyFormController {
 
         TableColumn<Property, String> criterionValueColumn = new TableColumn<>("Критерий потребительского качества");
         criterionValueColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getQualityCriterionValue()));
+                new SimpleStringProperty("TODO"));
         criterionValueColumn.setCellFactory(column -> new TableCell<Property, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {

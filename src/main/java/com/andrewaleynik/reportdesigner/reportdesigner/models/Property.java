@@ -24,7 +24,6 @@ public class Property {
     @JoinColumn(name = "unit_id", foreignKey = @ForeignKey(name = "fk_unit_id"))
     private PropertyUnit unit;
     private String currentValue;
-    private String qualityCriterionValue;
 
 
     public Long getId() {
@@ -75,20 +74,13 @@ public class Property {
         toAdd.forEach(this::addQuality);
     }
 
+
     public String getCurrentValue() {
         return currentValue;
     }
 
-    public void setCurrentValue(String currentValue) {
-        this.currentValue = currentValue;
-    }
-
-    public String getQualityCriterionValue() {
-        return qualityCriterionValue;
-    }
-
     public void setQualityCriterionValue(String qualityCriterionValue) {
-        this.qualityCriterionValue = qualityCriterionValue;
+        this.currentValue = currentValue;
     }
 
     @Override
@@ -101,7 +93,6 @@ public class Property {
                 .add("qualities=" + qualitiesString)
                 .add("unit=" + unit)
                 .add("currentValue=" + currentValue)
-                .add("qualityCriterionValue=" + qualityCriterionValue)
                 .toString();
     }
 
@@ -114,12 +105,11 @@ public class Property {
         }
         return Objects.equals(qualities, property.qualities)
                 && Objects.equals(unit, property.unit)
-                && Objects.equals(currentValue, property.currentValue)
-                && Objects.equals(qualityCriterionValue, property.qualityCriterionValue);
+                && Objects.equals(currentValue, property.currentValue);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(qualities, unit, currentValue, qualityCriterionValue);
+        return Objects.hash(qualities, unit, currentValue);
     }
 }

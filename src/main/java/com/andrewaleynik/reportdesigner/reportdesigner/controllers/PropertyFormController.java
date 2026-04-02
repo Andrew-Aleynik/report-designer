@@ -150,10 +150,7 @@ public class PropertyFormController {
                 Optional.ofNullable(editingProperty.getCurrentValue())
                         .orElse("")
         );
-        qualityCriterionValueField.textProperty().set(
-                Optional.ofNullable(editingProperty.getQualityCriterionValue())
-                        .orElse("")
-        );
+        qualityCriterionValueField.textProperty().set("TODO");
         if (editingProperty.getUnit() != null) {
             unitComboBox.valueProperty().set(
                     editingProperty.getUnit()
@@ -169,10 +166,10 @@ public class PropertyFormController {
     private void createNewProperty() {
         Property property = new Property();
         property.addQuality(qualityDataModel.getSelectedQuality());
-        property.setCurrentValue(
-                Optional.ofNullable(currentValueField.getText())
-                        .orElse("")
-        );
+//        property.setCurrentValue(
+//                Optional.ofNullable(currentValueField.getText())
+//                        .orElse("")
+//        );
         property.setQualityCriterionValue(
                 Optional.ofNullable(qualityCriterionValueField.getText())
                         .orElse("")
@@ -182,10 +179,10 @@ public class PropertyFormController {
     }
 
     private void updateExistingProperty() {
-        editingProperty.setCurrentValue(
-                Optional.ofNullable(currentValueField.getText())
-                        .orElse("")
-        );
+//        editingProperty.setCurrentValue(
+//                Optional.ofNullable(currentValueField.getText())
+//                        .orElse("")
+//        );
         editingProperty.setQualityCriterionValue(
                 Optional.ofNullable(qualityCriterionValueField.getText())
                         .orElse("")

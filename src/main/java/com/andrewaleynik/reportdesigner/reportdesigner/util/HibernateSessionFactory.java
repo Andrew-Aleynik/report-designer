@@ -40,9 +40,12 @@ public class HibernateSessionFactory {
                 Element.class,
                 ElementQuality.class,
                 ElementType.class,
+                ExternalInfluenceGroup.class,
                 ExternalInfluence.class,
+                ExternalInfluenceLevel.class,
                 Property.class,
-                PropertyUnit.class
+                PropertyUnit.class,
+                PropertyValue.class
         };
 
         for (Class<?> clazz : annotatedClasses) {

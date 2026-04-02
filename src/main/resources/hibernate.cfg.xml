@@ -54,7 +54,10 @@
         <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality"/>
         <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.Property"/>
         <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyUnit"/>
+        <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyValue"/>
+        <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluenceGroup"/>
         <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluence"/>
+        <mapping class="com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluenceLevel"/>
 
     </session-factory>
 </hibernate-configuration>

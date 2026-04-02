@@ -15,6 +15,9 @@ public class ExternalInfluence {
     private Long id;
     private String name;
     private String description;
+    @ManyToOne
+    @JoinColumn(name = "external_influence_group_id")
+    private ExternalInfluenceGroup externalInfluenceGroup;
 
     public Long getId() {
         return this.id;

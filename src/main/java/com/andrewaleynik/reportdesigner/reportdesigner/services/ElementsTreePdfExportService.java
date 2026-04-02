@@ -226,8 +226,9 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
                     getUnitName(property), normalFont, false, TextAlignment.LEFT));
             propsTable.addCell(createCell(
                     property.getCurrentValue(), normalFont, false, TextAlignment.CENTER));
-            propsTable.addCell(createCell(
-                    property.getQualityCriterionValue(), normalFont, false, TextAlignment.CENTER));
+            //TODO add property values writing
+//            propsTable.addCell(createCell(
+//                    property.getQualityCriterionValue(), normalFont, false, TextAlignment.CENTER));
         }
 
         document.add(propsTable);
