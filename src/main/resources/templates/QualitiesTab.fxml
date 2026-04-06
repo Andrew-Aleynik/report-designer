@@ -31,10 +31,12 @@
             </HBox>
 
             <Label text="Граничное условие:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-            <TextField fx:id="satisfyingCostField" GridPane.rowIndex="3" GridPane.columnIndex="1" prefWidth="200" promptText="0.00"/>
+            <TextField fx:id="satisfyingCostField" GridPane.rowIndex="3" GridPane.columnIndex="1" prefWidth="200"
+                       promptText="0.00"/>
 
             <Label text="Фактическая стоимость:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-            <TextField fx:id="actualCostField" GridPane.rowIndex="4" GridPane.columnIndex="1" prefWidth="200" promptText="0.00"/>
+            <TextField fx:id="actualCostField" GridPane.rowIndex="4" GridPane.columnIndex="1" prefWidth="200"
+                       promptText="0.00"/>
         </GridPane>
 
         <!-- Свойства качества -->

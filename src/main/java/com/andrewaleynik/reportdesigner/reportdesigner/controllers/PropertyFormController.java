@@ -28,7 +28,7 @@ public class PropertyFormController {
     private final QualityDataModel qualityDataModel;
     private final PropertyDataModel propertyDataModel;
     @FXML
-    private TextField currentValueField;
+    private TextField nameField;
     @FXML
     private TextField qualityCriterionValueField;
     @FXML
@@ -53,7 +53,7 @@ public class PropertyFormController {
     @FXML
     public void initialize() {
         initializeUnitComboBox();
-        currentValueField.textProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
+        nameField.textProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
         qualityCriterionValueField.textProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
         unitComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
 
@@ -146,11 +146,8 @@ public class PropertyFormController {
     }
 
     private void populateFormWithProperty() {
-        currentValueField.textProperty().set(
-                Optional.ofNullable(editingProperty.getCurrentValue())
-                        .orElse("")
-        );
-        qualityCriterionValueField.textProperty().set("TODO");
+        nameField.textProperty().set(editingProperty.getName());
+        qualityCriterionValueField.textProperty().set(editingProperty.getQualityCriterionValue());
         if (editingProperty.getUnit() != null) {
             unitComboBox.valueProperty().set(
                     editingProperty.getUnit()
@@ -160,16 +157,15 @@ public class PropertyFormController {
 
     private boolean validateForm() {
         ElementQuality quality = qualityDataModel.getSelectedQuality();
-        return quality == null;
+        String name = nameField.getText().trim();
+        PropertyUnit unit = unitComboBox.getSelectionModel().getSelectedItem();
+        return quality == null || name.isEmpty() || unit == null;
     }
 
     private void createNewProperty() {
         Property property = new Property();
+        property.setName(nameField.getText());
         property.addQuality(qualityDataModel.getSelectedQuality());
-//        property.setCurrentValue(
-//                Optional.ofNullable(currentValueField.getText())
-//                        .orElse("")
-//        );
         property.setQualityCriterionValue(
                 Optional.ofNullable(qualityCriterionValueField.getText())
                         .orElse("")
@@ -179,10 +175,7 @@ public class PropertyFormController {
     }
 
     private void updateExistingProperty() {
-//        editingProperty.setCurrentValue(
-//                Optional.ofNullable(currentValueField.getText())
-//                        .orElse("")
-//        );
+        editingProperty.setName(nameField.getText());
         editingProperty.setQualityCriterionValue(
                 Optional.ofNullable(qualityCriterionValueField.getText())
                         .orElse("")

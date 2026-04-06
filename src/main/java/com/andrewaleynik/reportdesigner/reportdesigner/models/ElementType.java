@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
 import java.util.StringJoiner;
 
 @NoArgsConstructor
@@ -45,14 +44,11 @@ public class ElementType {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ElementType elementType)) return false;
-        if (id != null && elementType.id != null) {
-            return id.equals(elementType.id);
-        }
-        return name.equals(elementType.name);
+        return id != null && id.equals(elementType.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name);
+        return getClass().hashCode();
     }
 }

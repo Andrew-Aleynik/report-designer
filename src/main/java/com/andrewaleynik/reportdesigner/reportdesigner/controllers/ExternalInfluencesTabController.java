@@ -2,7 +2,6 @@ package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.App;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ExternalInfluencesDataModel;
-import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluence;
 import com.andrewaleynik.reportdesigner.reportdesigner.util.AlertFactory;
 import javafx.beans.property.SimpleStringProperty;
@@ -75,6 +74,27 @@ public class ExternalInfluencesTabController {
             }
         });
 
+        TableColumn<ExternalInfluence, String> externalInfluenceGroupColumn = new TableColumn<>("Группа");
+        externalInfluenceGroupColumn.setCellValueFactory(cellData -> {
+            ExternalInfluence externalInfluence = cellData.getValue();
+            if (externalInfluence.getDescription() != null) {
+                return new SimpleStringProperty(externalInfluence.getExternalInfluenceGroup().getName());
+            } else {
+                return new SimpleStringProperty("");
+            }
+        });
+        descriptionColumn.setCellFactory(column -> new TableCell<ExternalInfluence, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                }
+            }
+        });
+
         TableColumn<ExternalInfluence, Void> actionsColumn = new TableColumn<>("Действия");
         actionsColumn.setCellFactory(column -> new TableCell<>() {
             private final Button editButton = new Button("Редактировать");
@@ -110,10 +130,12 @@ public class ExternalInfluencesTabController {
 
         nameColumn.setPrefWidth(200);
         descriptionColumn.setPrefWidth(200);
+        externalInfluenceGroupColumn.setPrefWidth(200);
         actionsColumn.setPrefWidth(200);
 
         externalInfluencesTableView.getColumns().clear();
-        externalInfluencesTableView.getColumns().addAll(nameColumn, descriptionColumn, actionsColumn);
+        externalInfluencesTableView.getColumns().addAll(nameColumn, descriptionColumn, externalInfluenceGroupColumn,
+                actionsColumn);
         externalInfluencesTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_NEXT_COLUMN);
         externalInfluencesTableView.setItems(externalInfluencesDataModel.getExternalInfluences());
     }

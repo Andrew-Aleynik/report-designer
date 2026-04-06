@@ -129,14 +129,11 @@ public class ElementQuality {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ElementQuality quality)) return false;
-        if (id != null && quality.id != null) {
-            return id.equals(quality.id);
-        }
-        return code.equals(quality.code);
+        return id != null && id.equals(quality.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(code);
+        return getClass().hashCode();
     }
 }

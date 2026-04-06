@@ -3,14 +3,13 @@ package com.andrewaleynik.reportdesigner.reportdesigner.models;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
 import java.util.StringJoiner;
 
 @NoArgsConstructor
 @Entity
 @Table(name = "property_values",
         uniqueConstraints = @UniqueConstraint(
-                columnNames = {"property_id", "external_influence_level_id"},
+                columnNames = {"property_id", "external_influence_id", "external_influence_level_id"},
                 name = "uk_property_level"
         ))
 public class PropertyValue {
@@ -21,8 +20,12 @@ public class PropertyValue {
     @JoinColumn(name = "property_id")
     private Property property;
     @ManyToOne
+    @JoinColumn(name = "external_influence_id")
+    private ExternalInfluence externalInfluence;
+    @ManyToOne
     @JoinColumn(name = "external_influence_level_id")
     private ExternalInfluenceLevel externalInfluenceLevel;
+    @Column(name = "val")
     private String value;
 
     public void setId(Long id) {
@@ -39,6 +42,14 @@ public class PropertyValue {
 
     public void setProperty(Property property) {
         this.property = property;
+    }
+
+    public ExternalInfluence getExternalInfluence() {
+        return externalInfluence;
+    }
+
+    public void setExternalInfluence(ExternalInfluence externalInfluence) {
+        this.externalInfluence = externalInfluence;
     }
 
     public ExternalInfluenceLevel getExternalInfluenceLevel() {
@@ -62,6 +73,7 @@ public class PropertyValue {
         return new StringJoiner(", ", "PropertyValue{", "}")
                 .add("id=" + id)
                 .add("property=" + property)
+                .add("externalInfluence=" + externalInfluence)
                 .add("externalInfluenceLevel=" + externalInfluenceLevel)
                 .add("value=" + value)
                 .toString();
@@ -71,16 +83,11 @@ public class PropertyValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PropertyValue propertyValue)) return false;
-        if (id != null && propertyValue.id != null) {
-            return id.equals(propertyValue.id);
-        }
-        return Objects.equals(property, propertyValue.property)
-                && Objects.equals(externalInfluenceLevel, propertyValue.externalInfluenceLevel)
-                && Objects.equals(value, propertyValue.value);
+        return id != null && id.equals(propertyValue.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(property, externalInfluenceLevel, value);
+        return getClass().hashCode();
     }
 }

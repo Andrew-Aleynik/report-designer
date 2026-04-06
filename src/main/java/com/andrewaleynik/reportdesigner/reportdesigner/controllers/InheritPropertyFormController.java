@@ -23,7 +23,7 @@ public class InheritPropertyFormController {
     private boolean saved = false;
     private Stage dialogStage;
 
-    private class ToggleButton extends Button {
+    private static class ToggleButton extends Button {
         private final String[] stateNames;
         private final int statesCount;
         private int currentState = 0;
@@ -106,25 +106,9 @@ public class InheritPropertyFormController {
             }
         });
 
-        TableColumn<Property, String> currentValueColumn = new TableColumn<>("Показатель потребительского качества");
-        currentValueColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getCurrentValue()));
-        currentValueColumn.setCellFactory(column -> new TableCell<Property, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item);
-                }
-            }
-        });
-
-
         TableColumn<Property, String> criterionValueColumn = new TableColumn<>("Критерий потребительского качества");
         criterionValueColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty("TODO"));
+                new SimpleStringProperty(cellData.getValue().getQualityCriterionValue()));
         criterionValueColumn.setCellFactory(column -> new TableCell<Property, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -170,12 +154,11 @@ public class InheritPropertyFormController {
         });
 
         unitColumn.setPrefWidth(150);
-        currentValueColumn.setPrefWidth(150);
         criterionValueColumn.setPrefWidth(150);
         actionsColumn.setPrefWidth(100);
 
         parentPropertiesTableView.getColumns().clear();
-        parentPropertiesTableView.getColumns().addAll(unitColumn, currentValueColumn, criterionValueColumn, actionsColumn);
+        parentPropertiesTableView.getColumns().addAll(unitColumn, criterionValueColumn, actionsColumn);
         parentPropertiesTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_NEXT_COLUMN);
         propertyDataModel.refreshParentProperties(qualityDataModel.getSelectedQuality());
         parentPropertiesTableView.setItems(propertyDataModel.getParentProperties());

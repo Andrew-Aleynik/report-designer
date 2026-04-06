@@ -152,9 +152,9 @@ class H2Test extends BaseTest {
 //        property.setCurrentValue("100");
         property.setQualityCriterionValue("200");
         property.setUnit(unit);
+        propertyDao.save(property);
         quality.addProperty(property);
         elementQualityDao.save(quality);
-        propertyDao.save(property);
 
         Optional<ElementQuality> foundQualityOptional = elementQualityDao.findById(quality.getId());
         assertThat(foundQualityOptional).isPresent();

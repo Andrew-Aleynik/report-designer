@@ -1,5 +1,7 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.dao;
 
+import org.hibernate.Session;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -15,4 +17,6 @@ public interface BaseDao<T> {
     void delete(T entity);
 
     void deleteById(Long id);
+
+    Session openSession();
 }

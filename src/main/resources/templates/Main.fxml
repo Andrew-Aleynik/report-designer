@@ -20,4 +20,8 @@
     <Tab text="Внешние воздействия">
         <fx:include source="ExternalInfluenceTab.fxml"/>
     </Tab>
+
+    <Tab text="Интенсивности внешних воздействий">
+        <fx:include source="ExternalInfluenceLevelsTab.fxml"/>
+    </Tab>
 </TabPane>

@@ -3,7 +3,10 @@ package com.andrewaleynik.reportdesigner.reportdesigner.models;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
@@ -13,16 +16,25 @@ public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String name;
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "properties")
     private Set<ElementQuality> qualities = new HashSet<>();
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "unit_id", foreignKey = @ForeignKey(name = "fk_unit_id"))
     private PropertyUnit unit;
-    private String currentValue;
-
+    private String qualityCriterionValue;
 
     public Long getId() {
         return this.id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public PropertyUnit getUnit() {
@@ -70,12 +82,12 @@ public class Property {
     }
 
 
-    public String getCurrentValue() {
-        return currentValue;
+    public String getQualityCriterionValue() {
+        return qualityCriterionValue;
     }
 
     public void setQualityCriterionValue(String qualityCriterionValue) {
-        this.currentValue = currentValue;
+        this.qualityCriterionValue = qualityCriterionValue;
     }
 
     @Override
@@ -87,7 +99,7 @@ public class Property {
                 .add("id=" + id)
                 .add("qualities=" + qualitiesString)
                 .add("unit=" + unit)
-                .add("currentValue=" + currentValue)
+                .add("qualityCriterionValue=" + qualityCriterionValue)
                 .toString();
     }
 
@@ -95,16 +107,11 @@ public class Property {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Property property)) return false;
-        if (id != null && property.id != null) {
-            return id.equals(property.id);
-        }
-        return Objects.equals(qualities, property.qualities)
-                && Objects.equals(unit, property.unit)
-                && Objects.equals(currentValue, property.currentValue);
+        return id != null && id.equals(property.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(qualities, unit, currentValue);
+        return getClass().hashCode();
     }
 }

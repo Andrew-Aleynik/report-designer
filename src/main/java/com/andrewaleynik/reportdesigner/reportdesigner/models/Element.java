@@ -142,14 +142,11 @@ public class Element {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Element element)) return false;
-        if (id != null && element.id != null) {
-            return id.equals(element.id);
-        }
-        return code.equals(element.code);
+        return id != null && id.equals(element.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(code);
+        return getClass().hashCode();
     }
 }

@@ -1,15 +1,22 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 
+import com.andrewaleynik.reportdesigner.reportdesigner.App;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ExternalInfluencesDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluence;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluenceGroup;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.AlertFactory;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 
 public class ExternalInfluenceFormController {
@@ -18,6 +25,8 @@ public class ExternalInfluenceFormController {
     private TextField nameField;
     @FXML
     private TextArea descriptionField;
+    @FXML
+    private ComboBox<ExternalInfluenceGroup> groupComboBox;
     @FXML
     private Button okButton;
     @FXML
@@ -44,8 +53,62 @@ public class ExternalInfluenceFormController {
 
         nameField.textProperty().addListener(propertyChangeListener());
         descriptionField.textProperty().addListener(propertyChangeListener());
+        groupComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
+        groupComboBox.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(ExternalInfluenceGroup item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getName());
+                }
+            }
+        });
+
+        groupComboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(ExternalInfluenceGroup item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getName());
+                }
+            }
+        });
+
+        groupComboBox.setItems(externalInfluencesDataModel.getExternalInfluenceGroups());
 
         updateOkButtonState();
+    }
+
+    @FXML
+    public void showAddGroupForm() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.FxmlPaths.ADD_EXTERNAL_INFLUENCE_GROUP_FORM));
+            loader.setControllerFactory(App.getControllerFactory());
+            Parent root = loader.load();
+            ExternalInfluenceGroupFormController controller = loader.getController();
+
+            Stage dialogStageChild = new Stage();
+            dialogStageChild.setTitle("Добавление группы внешних воздействий");
+            dialogStageChild.initModality(Modality.APPLICATION_MODAL);
+            dialogStageChild.initOwner(groupComboBox.getScene().getWindow());
+            dialogStageChild.setScene(new Scene(root));
+            dialogStageChild.setResizable(false);
+
+            controller.setDialogStage(dialogStageChild);
+
+            dialogStageChild.showAndWait();
+
+            if (controller.isSaved()) {
+                groupComboBox.getSelectionModel().select(externalInfluencesDataModel.getNewExternalInfluenceGroup());
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error opening form: {}", e.getMessage(), e);
+            AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
+        }
     }
 
     @FXML
@@ -71,18 +134,21 @@ public class ExternalInfluenceFormController {
     private void populateFormWithExternalInfluenceData() {
         nameField.setText(editingExternalInfluence.getName());
         descriptionField.setText(editingExternalInfluence.getDescription());
+        groupComboBox.getSelectionModel().select(editingExternalInfluence.getExternalInfluenceGroup());
     }
 
     private void createNewExternalInfluence() {
         ExternalInfluence externalInfluence = new ExternalInfluence();
         externalInfluence.setName(nameField.getText());
         externalInfluence.setDescription(descriptionField.getText());
+        externalInfluence.setExternalInfluenceGroup(groupComboBox.getValue());
         externalInfluencesDataModel.saveExternalInfluence(externalInfluence);
     }
 
     private void updateExistingExternalInfluence() {
         editingExternalInfluence.setName(nameField.getText());
         editingExternalInfluence.setDescription(descriptionField.getText());
+        editingExternalInfluence.setExternalInfluenceGroup(groupComboBox.getValue());
         externalInfluencesDataModel.updateExternalInfluence(editingExternalInfluence);
     }
 
@@ -93,9 +159,7 @@ public class ExternalInfluenceFormController {
 
     private boolean validateForm() {
         String name = nameField.getText();
-        String description = descriptionField.getText();
-        return name == null || name.trim().isEmpty()
-                || description == null || description.trim().isEmpty();
+        return name == null || name.trim().isEmpty();
     }
 
     private void closeDialog() {

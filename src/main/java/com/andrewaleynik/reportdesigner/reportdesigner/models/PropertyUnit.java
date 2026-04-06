@@ -39,14 +39,11 @@ public class PropertyUnit {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PropertyUnit propertyUnit)) return false;
-        if (id != null && propertyUnit.id != null) {
-            return id.equals(propertyUnit.id);
-        }
-        return Objects.equals(name, propertyUnit.name);
+        return id != null && id.equals(propertyUnit.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return getClass().hashCode();
     }
 }

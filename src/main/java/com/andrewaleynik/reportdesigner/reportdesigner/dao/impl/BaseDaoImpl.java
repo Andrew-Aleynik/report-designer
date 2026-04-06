@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -19,7 +18,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 
     private final Class<T> entityClass;
 
-    protected Session openSession() {
+    public Session openSession() {
         return HibernateSessionFactory.getSessionFactory().openSession();
     }
 

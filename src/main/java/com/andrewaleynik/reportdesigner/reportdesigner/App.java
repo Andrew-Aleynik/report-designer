@@ -51,6 +51,10 @@ public class App extends javafx.application.Application {
                 "/templates/ExternalInfluenceForm.fxml";
         public static final String INHERIT_PROPERTY_FORM =
                 "/templates/InheritPropertyForm.fxml";
+        public static final String ADD_EXTERNAL_INFLUENCE_GROUP_FORM =
+                "/templates/AddExternalInfluenceGroup.fxml";
+        public static final String ADD_EXTERNAL_INFLUENCE_LEVEL_FORM =
+                "/templates/AddExternalInfluenceLevel.fxml";
 
         private FxmlPaths() {
         }
@@ -68,7 +72,6 @@ public class App extends javafx.application.Application {
     private static final ElementDataModel elementDataModel;
     private static final QualityDataModel qualityDataModel;
     private static final PropertyDataModel propertyDataModel;
-
     private static final ExternalInfluencesDataModel externalInfluencesDataModel;
 
     static {
@@ -80,21 +83,30 @@ public class App extends javafx.application.Application {
             ElementTypeDao elementTypeDao = new ElementTypeDaoImpl();
             PropertyDao propertyDao = new PropertyDaoImpl();
             PropertyUnitDao propertyUnitDao = new PropertyUnitDaoImpl();
+            PropertyValueDao propertyValueDao = new PropertyValueDaoImpl();
             ExternalInfluenceDao externalInfluenceDao = new ExternalInfluenceDaoImpl();
+            ExternalInfluenceGroupDao externalInfluenceGroupDao = new ExternalInfluenceGroupDaoImpl();
+            ExternalInfluenceLevelDao externalInfluenceLevelDao = new ExternalInfluenceLevelDaoImpl();
 
             ElementService elementService = new ElementServiceImpl(elementDao, elementTypeDao);
             ElementQualityService elementQualityService =
                     new ElementQualityServiceImpl(elementQualityDao, propertyDao, propertyUnitDao);
             PropertyService propertyService = new PropertyServiceImpl(propertyDao, propertyUnitDao);
+            PropertyValueService propertyValueService = new PropertyValueServiceImpl(propertyValueDao);
             PdfExportService pdfExportService = new PdfExportService(
-                    new ElementsTreePdfExportService()
+                    new ElementsTreePdfExportService(propertyValueService)
             );
             ExternalInfluenceService externalInfluenceService = new ExternalInfluenceServiceImpl(externalInfluenceDao);
+            ExternalInfluenceGroupService externalInfluenceGroupService =
+                    new ExternalInfluenceGroupServiceImpl(externalInfluenceGroupDao);
+            ExternalInfluenceLevelService externalInfluenceLevelService =
+                    new ExternalInfluenceLevelServiceImpl(externalInfluenceLevelDao);
 
             elementDataModel = new ElementDataModel(elementService, pdfExportService);
             qualityDataModel = new QualityDataModel(elementQualityService);
-            propertyDataModel = new PropertyDataModel(elementService, elementQualityService, propertyService);
-            externalInfluencesDataModel = new ExternalInfluencesDataModel(externalInfluenceService);
+            propertyDataModel = new PropertyDataModel(elementService, elementQualityService, propertyService, propertyValueService);
+            externalInfluencesDataModel = new ExternalInfluencesDataModel(externalInfluenceService,
+                    externalInfluenceGroupService, externalInfluenceLevelService);
 
             log.info("Components were initialized");
         } catch (Exception e) {
@@ -198,6 +210,13 @@ public class App extends javafx.application.Application {
             return new ExternalInfluencesTabController(getExternalInfluencesDataModel());
         } else if (ExternalInfluenceFormController.class.equals(controllerClass)) {
             return new ExternalInfluenceFormController(getExternalInfluencesDataModel());
+        } else if (ExternalInfluenceGroupFormController.class.equals(controllerClass)) {
+            return new ExternalInfluenceGroupFormController(getExternalInfluencesDataModel());
+        } else if (ExternalInfluenceLevelFormController.class.equals(controllerClass)) {
+            return new ExternalInfluenceLevelFormController(getExternalInfluencesDataModel());
+        } else if (ExternalInfluenceLevelsTabController.class.equals(controllerClass)) {
+            return new ExternalInfluenceLevelsTabController(getExternalInfluencesDataModel(), getPropertyDataModel(),
+                    getQualityDataModel());
         } else if (InheritPropertyFormController.class.equals(controllerClass)) {
             return new InheritPropertyFormController(getQualityDataModel(), getPropertyDataModel());
         } else {

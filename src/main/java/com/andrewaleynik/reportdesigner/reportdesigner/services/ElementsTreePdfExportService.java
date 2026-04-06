@@ -1,9 +1,7 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.services;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.App;
-import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
-import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
-import com.andrewaleynik.reportdesigner.reportdesigner.models.Property;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.*;
 import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.font.PdfFont;
@@ -22,9 +20,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ElementsTreePdfExportService implements ExportService<TreeSet<Element>> {
+    private final PropertyValueService propertyValueService;
+
+    public ElementsTreePdfExportService(PropertyValueService propertyValueService) {
+        this.propertyValueService = propertyValueService;
+    }
 
     @Override
     public File export(TreeSet<Element> elementsTree) {
@@ -89,7 +93,6 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
                                    PdfFont boldFont, PdfFont normalFont) {
         int totalElements = elementsTree.size();
         int elementsWithQuality = countElementsWithQuality(elementsTree);
-        int maxDepth = calculateMaxDepth(elementsTree);
 
         Table statsTable = new Table(UnitValue.createPercentArray(new float[]{60, 40}));
         statsTable.setWidth(UnitValue.createPercentValue(90));
@@ -97,7 +100,6 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
         addStatRow(statsTable, "Общее количество элементов:", String.valueOf(totalElements), boldFont, normalFont);
         addStatRow(statsTable, "Элементов с качеством:", String.valueOf(elementsWithQuality), boldFont, normalFont);
         addStatRow(statsTable, "Элементов без качества:", String.valueOf(totalElements - elementsWithQuality), boldFont, normalFont);
-        addStatRow(statsTable, "Максимальная глубина дерева:", String.valueOf(maxDepth), boldFont, normalFont);
 
         document.add(statsTable);
     }
@@ -212,26 +214,105 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
 
     private void addQualityProperties(Document document, ElementQuality quality,
                                       PdfFont normalFont, PdfFont boldFont, int indent) throws IOException {
-        Table propsTable = new Table(UnitValue.createPercentArray(new float[]{20, 40, 40}));
-        propsTable.setWidth(UnitValue.createPercentValue(80));
+
+        // Заголовок раздела свойств
+        Paragraph propsHeader = new Paragraph("Свойства качества")
+                .setFont(boldFont)
+                .setFontSize(11)
+                .setMarginLeft(indent)
+                .setMarginBottom(5);
+        document.add(propsHeader);
+
+        // Получаем PropertyValues для этого качества
+        List<PropertyValue> propertyValues = quality.getProperties().stream()
+                .map(propertyValueService::getPropertyValueOfProperty)
+                .flatMap(List::stream)
+                .toList();
+
+        // Группируем по Property
+        Map<Property, List<PropertyValue>> valuesByProperty = propertyValues.stream()
+                .collect(Collectors.groupingBy(PropertyValue::getProperty));
+
+        // Таблица: Property | ExternalInfluence | Уровни и значения
+        Table propsTable = new Table(UnitValue.createPercentArray(new float[]{25, 25, 50}));
+        propsTable.setWidth(UnitValue.createPercentValue(90));
         propsTable.setMarginLeft(indent);
         propsTable.setMarginBottom(15);
 
-        propsTable.addHeaderCell(createCell("Единица измерения", boldFont, true, TextAlignment.CENTER));
-        propsTable.addHeaderCell(createCell("Текущее значение", boldFont, true, TextAlignment.CENTER));
-        propsTable.addHeaderCell(createCell("Критерий", boldFont, true, TextAlignment.CENTER));
+        // Заголовки
+        propsTable.addHeaderCell(createCell("Свойство", boldFont, true, TextAlignment.CENTER));
+        propsTable.addHeaderCell(createCell("Внешнее воздействие", boldFont, true, TextAlignment.CENTER));
+        propsTable.addHeaderCell(createCell("Значения по уровням", boldFont, true, TextAlignment.CENTER));
 
+        // Данные
         for (Property property : quality.getProperties()) {
-            propsTable.addCell(createCell(
-                    getUnitName(property), normalFont, false, TextAlignment.LEFT));
-            propsTable.addCell(createCell(
-                    property.getCurrentValue(), normalFont, false, TextAlignment.CENTER));
-            //TODO add property values writing
-//            propsTable.addCell(createCell(
-//                    property.getQualityCriterionValue(), normalFont, false, TextAlignment.CENTER));
+            List<PropertyValue> values = valuesByProperty.getOrDefault(property, Collections.emptyList());
+
+            // Группируем значения по ExternalInfluence
+            Map<ExternalInfluence, List<PropertyValue>> byInfluence = values.stream()
+                    .collect(Collectors.groupingBy(
+                            pv -> pv.getExternalInfluence() != null ? pv.getExternalInfluence() :
+                                    new ExternalInfluence() {{
+                                        setName("Без воздействия");
+                                    }}
+                    ));
+
+            if (byInfluence.isEmpty()) {
+                propsTable.addCell(createCell(getPropertyDisplay(property), normalFont, false, TextAlignment.LEFT));
+                propsTable.addCell(createCell("-", normalFont, false, TextAlignment.CENTER));
+                propsTable.addCell(createCell("-", normalFont, false, TextAlignment.CENTER));
+            } else {
+                boolean firstRow = true;
+                for (Map.Entry<ExternalInfluence, List<PropertyValue>> entry : byInfluence.entrySet()) {
+                    ExternalInfluence influence = entry.getKey();
+                    List<PropertyValue> influenceValues = entry.getValue();
+
+                    // Формируем строку значений по уровням
+                    String valuesStr = influenceValues.stream()
+                            .sorted(Comparator.comparing(pv ->
+                                    pv.getExternalInfluenceLevel() != null ?
+                                            pv.getExternalInfluenceLevel().getName() : ""))
+                            .map(pv -> {
+                                String levelName = pv.getExternalInfluenceLevel() != null ?
+                                        pv.getExternalInfluenceLevel().getName() : "Без уровня";
+                                String val = pv.getValue() != null ? pv.getValue() : "-";
+                                return levelName + ": " + val;
+                            })
+                            .collect(Collectors.joining("\n"));
+
+                    if (firstRow) {
+                        // Первая строка — с названием свойства
+                        propsTable.addCell(createCell(getPropertyDisplay(property), normalFont, false, TextAlignment.LEFT));
+                        firstRow = false;
+                    } else {
+                        // Продолжение — пустая ячейка (объединение по вертикали будет ниже)
+                        propsTable.addCell(createCell("", normalFont, false, TextAlignment.LEFT));
+                    }
+
+                    propsTable.addCell(createCell(
+                            influence.getName() != null ? influence.getName() : "-",
+                            normalFont, false, TextAlignment.LEFT));
+                    propsTable.addCell(createCell(valuesStr, normalFont, false, TextAlignment.LEFT));
+                }
+            }
         }
 
         document.add(propsTable);
+    }
+
+    // Вспомогательный метод для отображения Property
+    private String getPropertyDisplay(Property property) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("ID: ").append(property.getId());
+
+        if (property.getUnit() != null) {
+            sb.append("\nЕд.изм.: ").append(property.getUnit().getName());
+        }
+        if (property.getQualityCriterionValue() != null) {
+            sb.append("\nКритерий: ").append(property.getQualityCriterionValue());
+        }
+
+        return sb.toString();
     }
 
     private void addDetailRow(Table table, String label, String value, PdfFont font) {

@@ -44,16 +44,11 @@ public class ExternalInfluenceGroup {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ExternalInfluenceGroup group)) return false;
-
-        if (id != null && group.id != null) {
-            return id.equals(group.id);
-        }
-
-        return Objects.equals(name, group.name);
+        return id != null && id.equals(group.id);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return getClass().hashCode();
     }
 }

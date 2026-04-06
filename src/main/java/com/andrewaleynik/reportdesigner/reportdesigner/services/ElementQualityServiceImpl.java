@@ -4,9 +4,14 @@ import com.andrewaleynik.reportdesigner.reportdesigner.dao.ElementQualityDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyUnitDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.Property;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ElementQualityServiceImpl implements ElementQualityService {
     private final ElementQualityDao elementQualityDao;
@@ -42,7 +47,29 @@ public class ElementQualityServiceImpl implements ElementQualityService {
     }
 
     @Override
-    public void updateQuality(ElementQuality elementQuality) {
-        elementQualityDao.update(elementQuality);
+    public void updateQuality(ElementQuality detachedQuality) {
+        Session session = elementQualityDao.openSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            ElementQuality managed = session.find(ElementQuality.class, detachedQuality.getId());
+
+            managed.setCode(detachedQuality.getCode());
+            managed.setServiceLife(detachedQuality.getServiceLife());
+            managed.setSatisfyingCost(detachedQuality.getSatisfyingCost());
+            managed.setActualCost(detachedQuality.getActualCost());
+
+            detachedQuality.getProperties().stream()
+                    .map(p -> session.find(Property.class, p.getId()))
+                    .forEach(managed::addProperty);
+
+            session.flush();
+            tx.commit();
+
+        } catch (Exception e) {
+            tx.rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
     }
 }

@@ -129,6 +129,27 @@ public class ElementQualitiesTabController {
     }
 
     private void initializePropertiesTableView() {
+        TableColumn<Property, String> nameColumn = new TableColumn<>("Название");
+        nameColumn.setCellValueFactory(cellData -> {
+            Property property = cellData.getValue();
+            if (property.getUnit() != null) {
+                return new SimpleStringProperty(property.getName());
+            } else {
+                return new SimpleStringProperty("");
+            }
+        });
+        nameColumn.setCellFactory(column -> new TableCell<Property, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                }
+            }
+        });
+
         TableColumn<Property, String> unitColumn = new TableColumn<>("Единица измерения");
         unitColumn.setCellValueFactory(cellData -> {
             Property property = cellData.getValue();
@@ -150,25 +171,10 @@ public class ElementQualitiesTabController {
             }
         });
 
-        TableColumn<Property, String> currentValueColumn = new TableColumn<>("Показатель потребительского качества");
-        currentValueColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getCurrentValue()));
-        currentValueColumn.setCellFactory(column -> new TableCell<Property, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item);
-                }
-            }
-        });
-
 
         TableColumn<Property, String> criterionValueColumn = new TableColumn<>("Критерий потребительского качества");
         criterionValueColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty("TODO"));
+                new SimpleStringProperty(cellData.getValue().getQualityCriterionValue()));
         criterionValueColumn.setCellFactory(column -> new TableCell<Property, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -220,13 +226,13 @@ public class ElementQualitiesTabController {
             }
         });
 
+        nameColumn.setPrefWidth(200);
         unitColumn.setPrefWidth(150);
-        currentValueColumn.setPrefWidth(150);
         criterionValueColumn.setPrefWidth(150);
         actionsColumn.setPrefWidth(100);
 
         propertiesTableView.getColumns().clear();
-        propertiesTableView.getColumns().addAll(unitColumn, currentValueColumn, criterionValueColumn, actionsColumn);
+        propertiesTableView.getColumns().addAll(nameColumn, unitColumn, criterionValueColumn, actionsColumn);
         propertiesTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_NEXT_COLUMN);
         propertiesTableView.setItems(propertyDataModel.getCurrentProperties());
     }

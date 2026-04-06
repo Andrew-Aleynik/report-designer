@@ -167,7 +167,7 @@ public class ElementFormController {
             dialogStageChild.setScene(new Scene(root));
             dialogStageChild.setResizable(false);
 
-            controller.setDialogStage(dialogStage);
+            controller.setDialogStage(dialogStageChild);
 
             dialogStageChild.showAndWait();
 

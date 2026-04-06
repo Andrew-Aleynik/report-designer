@@ -39,15 +39,12 @@ public class ExternalInfluence {
         this.description = description;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ExternalInfluence externalInfluence)) return false;
-        if (id != null && externalInfluence.id != null) {
-            return id.equals(externalInfluence.id);
-        }
-        return Objects.equals(name, externalInfluence.name)
-                && Objects.equals(description, externalInfluence.description);
+    public ExternalInfluenceGroup getExternalInfluenceGroup() {
+        return externalInfluenceGroup;
+    }
+
+    public void setExternalInfluenceGroup(ExternalInfluenceGroup externalInfluenceGroup) {
+        this.externalInfluenceGroup = externalInfluenceGroup;
     }
 
     @Override
@@ -60,7 +57,14 @@ public class ExternalInfluence {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ExternalInfluence externalInfluence)) return false;
+        return id != null && id.equals(externalInfluence.id);
+    }
+
+    @Override
     public int hashCode() {
-        return Objects.hash(name, description);
+        return getClass().hashCode();
     }
 }
