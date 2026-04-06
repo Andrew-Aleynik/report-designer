@@ -294,7 +294,7 @@
                                         </copy>
                                         <exec executable="jlink" failonerror="true">
                                             <arg value="--module-path"/>
-                                            <arg value="${java.home}/jmods:${project.build.directory}/javafx-jmods"/>
+                                            <arg value="${java.home}/jmods${module.path.separator}${project.build.directory}/javafx-jmods"/>
                                             <arg value="--add-modules"/>
                                             <arg value="java.base,java.desktop,java.sql,java.naming,java.management,javafx.controls,javafx.fxml,javafx.swing,javafx.web"/>
                                             <arg value="--output"/>
@@ -338,6 +338,9 @@
             <properties>
                 <javafx.platform>win</javafx.platform>
                 <jpackage.os>windows</jpackage.os>
+                <module.path.separator>;</module.path.separator>
+                <java.home>C:\Program Files\Java\jdk-21</java.home>
+                <app.version>1.0.0</app.version>
             </properties>
             <dependencies>
                 <!-- JavaFX with win classifier -->
@@ -415,7 +418,7 @@
                                         </copy>
                                         <exec executable="jlink" failonerror="true">
                                             <arg value="--module-path"/>
-                                            <arg value="${java.home}/jmods:${project.build.directory}/javafx-jmods"/>
+                                            <arg value="${java.home}/jmods${module.path.separator}${project.build.directory}/javafx-jmods"/>
                                             <arg value="--add-modules"/>
                                             <arg value="java.base,java.desktop,java.sql,java.naming,java.management,javafx.controls,javafx.fxml,javafx.swing,javafx.web"/>
                                             <arg value="--output"/>
@@ -438,10 +441,8 @@
                                             <arg value="${project.build.directory}/runtime"/>
                                             <arg value="--dest"/>
                                             <arg value="${project.build.directory}/dist"/>
-                                            <arg value="--vendor"/>
-                                            <arg value="AndrewAleyNik"/>
                                             <arg value="--app-version"/>
-                                            <arg value="${project.version}"/>
+                                            <arg value="${app.version}"/>
                                         </exec>
                                     </target>
                                 </configuration>

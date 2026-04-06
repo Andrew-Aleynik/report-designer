@@ -13,6 +13,7 @@ public class QualityDataModel {
 
     public QualityDataModel(ElementQualityService elementQualityService) {
         this.elementQualityService = elementQualityService;
+        refreshQualities();
     }
 
     public ObservableList<ElementQuality> getQualities() {

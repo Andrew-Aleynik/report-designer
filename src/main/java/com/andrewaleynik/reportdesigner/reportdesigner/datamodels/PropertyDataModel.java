@@ -33,6 +33,7 @@ public class PropertyDataModel {
         this.elementQualityService = elementQualityService;
         this.propertyService = propertyService;
         this.propertyValueService = propertyValueService;
+        refreshPropertyUnits();
     }
 
     public Property getEditingProperty() {

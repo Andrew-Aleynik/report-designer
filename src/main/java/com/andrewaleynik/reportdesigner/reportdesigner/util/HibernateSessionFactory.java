@@ -17,19 +17,21 @@ public class HibernateSessionFactory {
 
     public static SessionFactory getSessionFactory() {
         if (!isInitialized()) {
-            try {
-                Configuration configuration = new Configuration();
-                configuration.configure("hibernate.cfg.xml");
+            synchronized (HibernateSessionFactory.class) {
+                try {
+                    Configuration configuration = new Configuration();
+                    configuration.configure("hibernate.cfg.xml");
 
-                addAnnotatedClasses(configuration);
+                    addAnnotatedClasses(configuration);
 
-                StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
-                        .applySettings(configuration.getProperties());
-                sessionFactory = configuration.buildSessionFactory(builder.build());
-                LOGGER.info("SessionFactory was created successful");
-            } catch (Exception e) {
-                LOGGER.error("Error creating SessionFactory");
-                throw new HibernateError("Could not create SessionFactory", e);
+                    StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
+                            .applySettings(configuration.getProperties());
+                    sessionFactory = configuration.buildSessionFactory(builder.build());
+                    LOGGER.info("SessionFactory was created successful");
+                } catch (Exception e) {
+                    LOGGER.error("Error creating SessionFactory");
+                    throw new HibernateError("Could not create SessionFactory", e);
+                }
             }
         }
         return sessionFactory;

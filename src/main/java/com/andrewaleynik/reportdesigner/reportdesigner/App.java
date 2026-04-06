@@ -24,8 +24,8 @@ public class App extends javafx.application.Application {
     private static final Logger log = LoggerFactory.getLogger(App.class);
 
     private static final String APP_NAME = "Конструктор отчетов";
-    private static final int STARTUP_WIDTH = 750;
-    private static final int STARTUP_HEIGHT = 1000;
+    private static final int STARTUP_WIDTH = 600;
+    private static final int STARTUP_HEIGHT = 800;
 
     public static final class FxmlPaths {
         public static final String MAIN = "/templates/Main.fxml";
