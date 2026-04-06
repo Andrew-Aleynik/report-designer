@@ -163,7 +163,7 @@
                     <source>24</source>
                     <target>24</target>
                     <release>24</release>
-<!--                    <jdkHome>${java.home}</jdkHome>-->
+                    <!--                    <jdkHome>${java.home}</jdkHome>-->
                     <fork>true</fork>
                 </configuration>
             </plugin>
@@ -210,7 +210,9 @@
         <profile>
             <id>dev-linux</id>
             <activation>
-                <os><family>unix</family></os>
+                <os>
+                    <family>unix</family>
+                </os>
             </activation>
             <properties>
                 <javafx.platform>linux</javafx.platform>
@@ -286,7 +288,8 @@
                                     <target>
                                         <copy todir="${project.build.directory}/javafx-jmods" flatten="true">
                                             <fileset dir="${settings.localRepository}">
-                                                <include name="org/openjfx/javafx-*/${javafx.version}/javafx-*-${javafx.version}-linux.jar"/>
+                                                <include
+                                                        name="org/openjfx/javafx-*/${javafx.version}/javafx-*-${javafx.version}-linux.jar"/>
                                             </fileset>
                                         </copy>
                                         <exec executable="jlink" failonerror="true">
@@ -406,7 +409,8 @@
                                     <target>
                                         <copy todir="${project.build.directory}/javafx-jmods" flatten="true">
                                             <fileset dir="${settings.localRepository}">
-                                                <include name="org/openjfx/javafx-*/${javafx.version}/javafx-*-${javafx.version}-win.jar"/>
+                                                <include
+                                                        name="org/openjfx/javafx-*/${javafx.version}/javafx-*-${javafx.version}-win.jar"/>
                                             </fileset>
                                         </copy>
                                         <exec executable="jlink" failonerror="true">
