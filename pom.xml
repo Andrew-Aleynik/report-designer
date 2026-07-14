@@ -20,9 +20,9 @@
         <mockito.version>5.8.0</mockito.version>
 
         <!-- Build settings -->
-        <maven.compiler.release>24</maven.compiler.release>
-        <maven.compiler.source>24</maven.compiler.source>
-        <maven.compiler.target>24</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
 
         <!-- JDK path (adjust per machine if needed) -->
         <java.home>/usr/lib/jvm/jdk-24.0.2-oracle-x64</java.home>
@@ -122,7 +122,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.28</version>
+            <version>1.18.30</version>
             <scope>compile</scope>
         </dependency>
 
@@ -136,7 +136,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
+            <version>3.27.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -160,10 +160,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.12.1</version>
                 <configuration>
-                    <source>24</source>
-                    <target>24</target>
-                    <release>24</release>
-                    <!--                    <jdkHome>${java.home}</jdkHome>-->
+                    <source>21</source>
+                    <target>21</target>
                     <fork>true</fork>
                 </configuration>
             </plugin>
@@ -217,6 +215,7 @@
             <properties>
                 <javafx.platform>linux</javafx.platform>
                 <jpackage.os>linux</jpackage.os>
+                <module.path.separator>:</module.path.separator>
             </properties>
             <dependencies>
                 <!-- JavaFX with linux classifier -->
