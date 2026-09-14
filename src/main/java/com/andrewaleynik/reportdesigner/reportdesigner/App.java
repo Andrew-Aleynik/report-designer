@@ -45,8 +45,8 @@ public class App extends javafx.application.Application {
     }
 
     public static final class FontPaths {
-        public static final String ARIAL = "/fonts/arialmt.ttf";
-        public static final String ARIAL_BOLD_ITALIC = "/fonts/arialmt.ttf";
+        public static final String REGULAR = "/fonts/DejaVuSans.ttf";
+        public static final String BOLD = "/fonts/DejaVuSans-Bold.ttf";
 
         private FontPaths() {
         }

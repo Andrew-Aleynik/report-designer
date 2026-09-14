@@ -19,8 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.TreeSet;
 
-import static com.andrewaleynik.reportdesigner.reportdesigner.App.FontPaths.ARIAL;
-import static com.andrewaleynik.reportdesigner.reportdesigner.App.FontPaths.ARIAL_BOLD_ITALIC;
+import static com.andrewaleynik.reportdesigner.reportdesigner.App.FontPaths.BOLD;
+import static com.andrewaleynik.reportdesigner.reportdesigner.App.FontPaths.REGULAR;
 
 /**
  * PDF export in the style of the "Эксперт" sample report
@@ -52,8 +52,8 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
             Document document = new Document(pdf, PageSize.A4);
             document.setMargins(40, 36, 50, 36);
 
-            PdfFont normalFont = loadFont(ARIAL);
-            PdfFont boldFont = loadFont(ARIAL_BOLD_ITALIC);
+            PdfFont normalFont = loadFont(REGULAR);
+            PdfFont boldFont = loadFont(BOLD);
 
             pdf.addEventHandler(PdfDocumentEvent.END_PAGE,
                     new ExpertPdfFooterHandler(normalFont, SYSTEM_LABEL));
@@ -87,7 +87,7 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
                                      PdfFont normalFont,
                                      PdfFont boldFont) {
         document.add(ExpertTableStyle.title(
-                "Технические требования (" + objectName + ")", boldFont));
+                "Технические требования к покрытию (" + objectName + ")", boldFont));
         document.add(ExpertTableStyle.subtitleLine());
         document.add(new Paragraph(" ")
                 .setFont(normalFont)

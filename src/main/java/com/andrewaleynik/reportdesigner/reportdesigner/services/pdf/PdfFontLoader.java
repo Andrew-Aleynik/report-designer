@@ -15,10 +15,13 @@ public final class PdfFontLoader {
     public static PdfFont loadFromClasspath(Class<?> context, String fontPath) throws IOException {
         try (InputStream fontStream = context.getResourceAsStream(fontPath)) {
             if (fontStream == null) {
-                throw new IOException("Шрифт не найден: " + fontPath);
+                throw new IOException("Font not found: " + fontPath);
             }
             byte[] fontData = fontStream.readAllBytes();
-            return PdfFontFactory.createFont(fontData, PdfEncodings.IDENTITY_H);
+            return PdfFontFactory.createFont(
+                    fontData,
+                    PdfEncodings.IDENTITY_H,
+                    PdfFontFactory.EmbeddingStrategy.FORCE_EMBEDDED);
         }
     }
 }
