@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            maven_profile: dev-linux
+          - os: windows-latest
+            maven_profile: prod-win
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build and test
+        # Override hardcoded java.home from pom.xml with CI JDK
+        run: mvn -B -P${{ matrix.maven_profile }} -Djava.home="$JAVA_HOME" clean verify
+        shell: bash
+
+      - name: Upload sample report
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sample-report-${{ matrix.os }}
+          path: target/sample-reports/expert-report.pdf
+          if-no-files-found: ignore
+
+      - name: Upload packaged JAR
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jar-${{ matrix.os }}
+          path: target/*-jar-with-dependencies.jar
+          if-no-files-found: ignore
