@@ -60,10 +60,11 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
 
             Element root = elementsTree.first();
             String objectName = root.getName() != null ? root.getName() : root.getCode();
+            String partTypeName = resolvePartTypeName(root);
 
             addRealInfluencesPage(document, elementsTree, normalFont, boldFont);
             document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-            addRequirementsPage(document, elementsTree, objectName, normalFont, boldFont);
+            addRequirementsPage(document, elementsTree, partTypeName, objectName, normalFont, boldFont);
 
             document.close();
             return tempFile;
@@ -83,17 +84,26 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
 
     private void addRequirementsPage(Document document,
                                      TreeSet<Element> elementsTree,
+                                     String partTypeName,
                                      String objectName,
                                      PdfFont normalFont,
                                      PdfFont boldFont) {
         document.add(ExpertTableStyle.title(
-                "Технические требования к покрытию (" + objectName + ")", boldFont));
+                "Технические требования к типу детали «" + partTypeName + "» (" + objectName + ")",
+                boldFont));
         document.add(ExpertTableStyle.subtitleLine());
         document.add(new Paragraph(" ")
                 .setFont(normalFont)
                 .setFontSize(8)
                 .setMarginBottom(4));
         document.add(reportTableBuilder.buildRequirementsTable(elementsTree, normalFont, boldFont));
+    }
+
+    private static String resolvePartTypeName(Element root) {
+        if (root.getType() != null && root.getType().getName() != null && !root.getType().getName().isBlank()) {
+            return root.getType().getName().trim();
+        }
+        return "не указан";
     }
 
     private PdfFont loadFont(String fontPath) throws IOException {

@@ -118,6 +118,12 @@ public class PreviewController implements DialogController {
     }
 
     @FXML
+    public void handlePrint() {
+        AlertFactory.showInfo("Печать",
+                "Печать пока не реализована. Сохраните PDF и распечатайте его из программы просмотра.");
+    }
+
+    @FXML
     public void handleClose() {
         if (currentPdfFile != null && currentPdfFile.exists()) {
             Optional<ButtonType> result = AlertFactory.showConfirmation(

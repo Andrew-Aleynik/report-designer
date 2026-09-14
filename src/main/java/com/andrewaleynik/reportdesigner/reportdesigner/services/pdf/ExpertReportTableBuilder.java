@@ -73,7 +73,7 @@ public class ExpertReportTableBuilder {
 
         table.addHeaderCell(ExpertTableStyle.headerCell("#", boldFont, TextAlignment.CENTER));
         table.addHeaderCell(ExpertTableStyle.headerCell(
-                "Свойства покр. и моделирующее возд-ие", boldFont, TextAlignment.LEFT));
+                "Свойства и моделирующее возд-ие", boldFont, TextAlignment.LEFT));
         table.addHeaderCell(ExpertTableStyle.headerCell("Реж. при испытаниях", boldFont, TextAlignment.LEFT));
         table.addHeaderCell(ExpertTableStyle.headerCell("Показатель св-ва", boldFont, TextAlignment.LEFT));
         table.addHeaderCell(ExpertTableStyle.headerCell("Норма на показатель", boldFont, TextAlignment.LEFT));
