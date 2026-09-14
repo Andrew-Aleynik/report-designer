@@ -37,6 +37,8 @@ public final class ControllerFactory implements Callback<Class<?>, Object> {
                 ctx -> new PropertyFormController(ctx.getQualityDataModel(), ctx.getPropertyDataModel()));
         registry.put(PropertyUnitFormController.class,
                 ctx -> new PropertyUnitFormController(ctx.getPropertyDataModel()));
+        registry.put(PropertyGroupFormController.class,
+                ctx -> new PropertyGroupFormController(ctx.getPropertyDataModel()));
         registry.put(PreviewController.class, ctx -> new PreviewController());
         registry.put(ExternalInfluencesTabController.class,
                 ctx -> new ExternalInfluencesTabController(ctx.getExternalInfluencesDataModel()));
@@ -45,7 +47,8 @@ public final class ControllerFactory implements Callback<Class<?>, Object> {
         registry.put(ExternalInfluenceGroupFormController.class,
                 ctx -> new ExternalInfluenceGroupFormController(ctx.getExternalInfluencesDataModel()));
         registry.put(ExternalInfluenceLevelFormController.class,
-                ctx -> new ExternalInfluenceLevelFormController(ctx.getExternalInfluencesDataModel()));
+                ctx -> new ExternalInfluenceLevelFormController(
+                        ctx.getExternalInfluencesDataModel(), ctx.getPropertyDataModel()));
         registry.put(ExternalInfluenceLevelsTabController.class,
                 ctx -> new ExternalInfluenceLevelsTabController(
                         ctx.getExternalInfluencesDataModel(),

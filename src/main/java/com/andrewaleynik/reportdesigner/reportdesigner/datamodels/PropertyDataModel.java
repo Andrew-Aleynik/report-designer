@@ -15,7 +15,9 @@ public class PropertyDataModel extends ObservableDataModel {
 
     private Property editingProperty;
     private final ObservableList<PropertyUnit> propertyUnits = FXCollections.observableArrayList();
+    private final ObservableList<PropertyGroup> propertyGroups = FXCollections.observableArrayList();
     private PropertyUnit newPropertyUnit;
+    private PropertyGroup newPropertyGroup;
     private final ObservableList<Property> currentProperties = FXCollections.observableArrayList();
     private final Set<Property> inheritedProperties = new HashSet<>();
     private final ObservableList<Property> parentProperties = FXCollections.observableArrayList();
@@ -30,6 +32,7 @@ public class PropertyDataModel extends ObservableDataModel {
         this.propertyService = propertyService;
         this.propertyValueService = propertyValueService;
         refreshPropertyUnits();
+        refreshPropertyGroups();
     }
 
     public Property getEditingProperty() {
@@ -40,8 +43,16 @@ public class PropertyDataModel extends ObservableDataModel {
         return propertyUnits;
     }
 
+    public ObservableList<PropertyGroup> getPropertyGroups() {
+        return propertyGroups;
+    }
+
     public PropertyUnit getNewPropertyUnit() {
         return newPropertyUnit;
+    }
+
+    public PropertyGroup getNewPropertyGroup() {
+        return newPropertyGroup;
     }
 
     public List<PropertyValue> getPropertyValuesOfQuality(ElementQuality quality) {
@@ -69,6 +80,11 @@ public class PropertyDataModel extends ObservableDataModel {
 
     public void refreshPropertyUnits() {
         propertyUnits.setAll(propertyService.getPropertyUnits());
+        fireChanged();
+    }
+
+    public void refreshPropertyGroups() {
+        propertyGroups.setAll(propertyService.getPropertyGroups());
         fireChanged();
     }
 
@@ -137,6 +153,12 @@ public class PropertyDataModel extends ObservableDataModel {
         propertyService.savePropertyUnit(propertyUnit);
         newPropertyUnit = propertyUnit;
         refreshPropertyUnits();
+    }
+
+    public void savePropertyGroup(PropertyGroup propertyGroup) {
+        propertyService.savePropertyGroup(propertyGroup);
+        newPropertyGroup = propertyGroup;
+        refreshPropertyGroups();
     }
 
     public void addInheritedProperty(Property property) {

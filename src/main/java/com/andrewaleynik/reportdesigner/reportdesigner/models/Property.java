@@ -23,6 +23,9 @@ public class Property {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "unit_id", foreignKey = @ForeignKey(name = "fk_unit_id"))
     private PropertyUnit unit;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "property_group_id", foreignKey = @ForeignKey(name = "fk_property_group_id"))
+    private PropertyGroup propertyGroup;
     private String qualityCriterionValue;
 
     public Long getId() {
@@ -43,6 +46,14 @@ public class Property {
 
     public void setUnit(PropertyUnit unit) {
         this.unit = unit;
+    }
+
+    public PropertyGroup getPropertyGroup() {
+        return propertyGroup;
+    }
+
+    public void setPropertyGroup(PropertyGroup propertyGroup) {
+        this.propertyGroup = propertyGroup;
     }
 
     public Set<ElementQuality> getQualities() {
@@ -99,6 +110,7 @@ public class Property {
                 .add("id=" + id)
                 .add("qualities=" + qualitiesString)
                 .add("unit=" + unit)
+                .add("propertyGroup=" + propertyGroup)
                 .add("qualityCriterionValue=" + qualityCriterionValue)
                 .toString();
     }

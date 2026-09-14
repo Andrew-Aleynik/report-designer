@@ -28,6 +28,7 @@ public final class ApplicationContext {
         ElementTypeDao elementTypeDao = new ElementTypeDaoImpl();
         PropertyDao propertyDao = new PropertyDaoImpl();
         PropertyUnitDao propertyUnitDao = new PropertyUnitDaoImpl();
+        PropertyGroupDao propertyGroupDao = new PropertyGroupDaoImpl();
         PropertyValueDao propertyValueDao = new PropertyValueDaoImpl();
         ExternalInfluenceDao externalInfluenceDao = new ExternalInfluenceDaoImpl();
         ExternalInfluenceGroupDao externalInfluenceGroupDao = new ExternalInfluenceGroupDaoImpl();
@@ -36,7 +37,8 @@ public final class ApplicationContext {
         ElementService elementService = new ElementServiceImpl(elementDao, elementTypeDao);
         ElementQualityService elementQualityService =
                 new ElementQualityServiceImpl(elementQualityDao, propertyDao, propertyUnitDao);
-        PropertyService propertyService = new PropertyServiceImpl(propertyDao, propertyUnitDao);
+        PropertyService propertyService = new PropertyServiceImpl(
+                propertyDao, propertyUnitDao, propertyGroupDao);
         PropertyValueService propertyValueService = new PropertyValueServiceImpl(propertyValueDao);
         PdfExportService pdfExportService = new PdfExportService(
                 new ElementsTreePdfExportService(propertyValueService)

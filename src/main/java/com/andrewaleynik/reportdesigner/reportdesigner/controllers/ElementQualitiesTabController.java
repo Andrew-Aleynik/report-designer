@@ -81,6 +81,8 @@ public class ElementQualitiesTabController {
 
     private void initializePropertiesTableView() {
         TableColumn<Property, String> nameColumn = JavaFxControls.textColumn("Название", Property::getName);
+        TableColumn<Property, String> groupColumn = JavaFxControls.textColumn("Группа",
+                property -> property.getPropertyGroup() != null ? property.getPropertyGroup().getName() : "");
         TableColumn<Property, String> unitColumn = JavaFxControls.textColumn("Единица измерения",
                 property -> property.getUnit() != null ? property.getUnit().getName() : "");
         TableColumn<Property, String> criterionValueColumn = JavaFxControls.textColumn(
@@ -90,12 +92,14 @@ public class ElementQualitiesTabController {
                 this::handleDeleteProperty
         );
 
-        nameColumn.setPrefWidth(200);
-        unitColumn.setPrefWidth(150);
+        nameColumn.setPrefWidth(180);
+        groupColumn.setPrefWidth(140);
+        unitColumn.setPrefWidth(120);
         criterionValueColumn.setPrefWidth(150);
         actionsColumn.setPrefWidth(100);
 
-        propertiesTableView.getColumns().setAll(nameColumn, unitColumn, criterionValueColumn, actionsColumn);
+        propertiesTableView.getColumns().setAll(
+                nameColumn, groupColumn, unitColumn, criterionValueColumn, actionsColumn);
         JavaFxControls.configureConstrainedTable(propertiesTableView);
         propertiesTableView.setItems(propertyDataModel.getCurrentProperties());
     }

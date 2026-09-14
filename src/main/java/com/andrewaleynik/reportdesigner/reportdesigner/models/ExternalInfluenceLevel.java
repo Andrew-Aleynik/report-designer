@@ -13,6 +13,9 @@ public class ExternalInfluenceLevel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "property_group_id", foreignKey = @ForeignKey(name = "fk_level_property_group_id"))
+    private PropertyGroup propertyGroup;
 
     public void setId(Long id) {
         this.id = id;
@@ -30,11 +33,20 @@ public class ExternalInfluenceLevel {
         return name;
     }
 
+    public PropertyGroup getPropertyGroup() {
+        return propertyGroup;
+    }
+
+    public void setPropertyGroup(PropertyGroup propertyGroup) {
+        this.propertyGroup = propertyGroup;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", "ExternalInfluenceLevel{", "}")
                 .add("id=" + id)
                 .add("name=" + name)
+                .add("propertyGroup=" + propertyGroup)
                 .toString();
     }
 

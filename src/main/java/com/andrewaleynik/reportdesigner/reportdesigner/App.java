@@ -30,6 +30,7 @@ public class App extends javafx.application.Application {
         public static final String EDIT_ELEMENT_FORM = "/templates/EditElementForm.fxml";
         public static final String ADD_PROPERTY_FORM = "/templates/AddPropertyForm.fxml";
         public static final String ADD_PROPERTY_UNIT_FORM = "/templates/AddPropertyUnitForm.fxml";
+        public static final String ADD_PROPERTY_GROUP_FORM = "/templates/AddPropertyGroupForm.fxml";
         public static final String EXPORT_PREVIEW = "/templates/PdfPreview.fxml";
         public static final String ADD_EXTERNAL_INFLUENCE_FORM = "/templates/ExternalInfluenceForm.fxml";
         public static final String EDIT_EXTERNAL_INFLUENCE_FORM = "/templates/ExternalInfluenceForm.fxml";

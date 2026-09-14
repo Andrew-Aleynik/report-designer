@@ -16,8 +16,15 @@
         <Label text="Критерий потребительского свойства:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
         <TextField fx:id="qualityCriterionValueField" GridPane.rowIndex="1" GridPane.columnIndex="1" prefWidth="200"/>
 
-        <Label text="Размерность:" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+        <Label text="Группа свойств:" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
         <HBox spacing="5" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2">
+            <ComboBox fx:id="propertyGroupComboBox" prefWidth="175"/>
+            <Button text="+" style="-fx-font-weight: bold;"
+                    onAction="#handleCreatePropertyGroup"/>
+        </HBox>
+
+        <Label text="Размерность:" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+        <HBox spacing="5" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2">
             <ComboBox fx:id="unitComboBox" prefWidth="175"/>
             <Button text="+" style="-fx-font-weight: bold;"
                     onAction="#handleCreateUnit"/>

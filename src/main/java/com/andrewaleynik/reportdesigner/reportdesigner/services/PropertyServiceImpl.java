@@ -1,9 +1,11 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.services;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyDao;
+import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyGroupDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyUnitDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Property;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyGroup;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyUnit;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -19,12 +21,16 @@ import java.util.stream.Collectors;
 public class PropertyServiceImpl implements PropertyService {
     private final PropertyDao propertyDao;
     private final PropertyUnitDao propertyUnitDao;
+    private final PropertyGroupDao propertyGroupDao;
 
     private final Validator validator;
 
-    public PropertyServiceImpl(PropertyDao propertyDao, PropertyUnitDao propertyUnitDao) {
+    public PropertyServiceImpl(PropertyDao propertyDao,
+                               PropertyUnitDao propertyUnitDao,
+                               PropertyGroupDao propertyGroupDao) {
         this.propertyDao = propertyDao;
         this.propertyUnitDao = propertyUnitDao;
+        this.propertyGroupDao = propertyGroupDao;
         ValidatorFactory factory = Validation.byDefaultProvider()
                 .configure()
                 .messageInterpolator(new ParameterMessageInterpolator())
@@ -42,6 +48,11 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public List<PropertyUnit> getPropertyUnits() {
         return propertyUnitDao.findAll();
+    }
+
+    @Override
+    public List<PropertyGroup> getPropertyGroups() {
+        return propertyGroupDao.findAll();
     }
 
     @Override
@@ -78,5 +89,10 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public void savePropertyUnit(PropertyUnit propertyUnit) {
         propertyUnitDao.save(propertyUnit);
+    }
+
+    @Override
+    public void savePropertyGroup(PropertyGroup propertyGroup) {
+        propertyGroupDao.save(propertyGroup);
     }
 }

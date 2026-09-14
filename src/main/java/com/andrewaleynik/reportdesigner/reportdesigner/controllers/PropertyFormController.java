@@ -4,6 +4,7 @@ import com.andrewaleynik.reportdesigner.reportdesigner.App;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.PropertyDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Property;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyGroup;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyUnit;
 import com.andrewaleynik.reportdesigner.reportdesigner.util.DialogOpener;
 import com.andrewaleynik.reportdesigner.reportdesigner.util.FormValidators;
@@ -27,6 +28,8 @@ public class PropertyFormController extends AbstractDialogController {
     @FXML
     private TextField qualityCriterionValueField;
     @FXML
+    private ComboBox<PropertyGroup> propertyGroupComboBox;
+    @FXML
     private ComboBox<PropertyUnit> unitComboBox;
     @FXML
     private Button okButton;
@@ -40,11 +43,15 @@ public class PropertyFormController extends AbstractDialogController {
 
     @FXML
     public void initialize() {
+        JavaFxControls.bindComboBoxDisplay(propertyGroupComboBox, PropertyGroup::getName);
+        propertyGroupComboBox.setItems(propertyDataModel.getPropertyGroups());
+
         JavaFxControls.bindComboBoxDisplay(unitComboBox, PropertyUnit::getName);
         unitComboBox.setItems(propertyDataModel.getPropertyUnits());
 
         nameField.textProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
         qualityCriterionValueField.textProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
+        propertyGroupComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
         unitComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
 
         if (editing) {
@@ -52,6 +59,19 @@ public class PropertyFormController extends AbstractDialogController {
         }
 
         updateOkButtonState();
+    }
+
+    @FXML
+    public void handleCreatePropertyGroup() {
+        DialogOpener.<PropertyGroupFormController>open(
+                App.FxmlPaths.ADD_PROPERTY_GROUP_FORM,
+                "Добавление группы свойств",
+                propertyGroupComboBox
+        ).ifPresent(result -> {
+            if (result.saved()) {
+                propertyGroupComboBox.getSelectionModel().select(propertyDataModel.getNewPropertyGroup());
+            }
+        });
     }
 
     @FXML
@@ -90,6 +110,7 @@ public class PropertyFormController extends AbstractDialogController {
         nameField.setText(Optional.ofNullable(editingProperty.getName()).orElse(""));
         qualityCriterionValueField.setText(
                 Optional.ofNullable(editingProperty.getQualityCriterionValue()).orElse(""));
+        propertyGroupComboBox.setValue(editingProperty.getPropertyGroup());
         unitComboBox.setValue(editingProperty.getUnit());
     }
 
@@ -99,6 +120,7 @@ public class PropertyFormController extends AbstractDialogController {
         property.addQuality(qualityDataModel.getSelectedQuality());
         property.setQualityCriterionValue(
                 Optional.ofNullable(qualityCriterionValueField.getText()).orElse(""));
+        property.setPropertyGroup(propertyGroupComboBox.getValue());
         property.setUnit(unitComboBox.getValue());
         propertyDataModel.saveProperty(property);
     }
@@ -107,6 +129,7 @@ public class PropertyFormController extends AbstractDialogController {
         editingProperty.setName(nameField.getText());
         editingProperty.setQualityCriterionValue(
                 Optional.ofNullable(qualityCriterionValueField.getText()).orElse(""));
+        editingProperty.setPropertyGroup(propertyGroupComboBox.getValue());
         editingProperty.setUnit(unitComboBox.getValue());
         propertyDataModel.updateProperty(qualityDataModel.getSelectedQuality(), editingProperty);
     }
@@ -118,6 +141,7 @@ public class PropertyFormController extends AbstractDialogController {
     private boolean isFormInvalid() {
         return qualityDataModel.getSelectedQuality() == null
                 || FormValidators.isBlank(nameField.getText())
+                || propertyGroupComboBox.getValue() == null
                 || unitComboBox.getValue() == null;
     }
 }
