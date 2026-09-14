@@ -5,7 +5,8 @@ import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementQualitySe
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class QualityDataModel {
+public class QualityDataModel extends ObservableDataModel {
+
     private final ObservableList<ElementQuality> qualities = FXCollections.observableArrayList();
     private ElementQuality newQuality;
     private ElementQuality selectedQuality;
@@ -28,29 +29,28 @@ public class QualityDataModel {
         return selectedQuality;
     }
 
+    public void setSelectedQuality(ElementQuality quality) {
+        selectedQuality = quality;
+    }
+
     public void refreshQualities() {
         qualities.setAll(elementQualityService.getAllQualities());
-    }
-
-    public void refreshNewQuality(ElementQuality quality) {
-        newQuality = quality;
-    }
-
-    public void refreshSelectedQuality(ElementQuality quality) {
-        selectedQuality = quality;
+        fireChanged();
     }
 
     public void saveQuality(ElementQuality quality) {
         elementQualityService.saveQuality(quality);
-        refreshNewQuality(quality);
+        newQuality = quality;
         refreshQualities();
     }
 
     public void updateQuality(ElementQuality quality) {
         elementQualityService.updateQuality(quality);
+        fireChanged();
     }
 
     public void deleteQuality(ElementQuality quality) {
         elementQualityService.deleteQuality(quality);
+        refreshQualities();
     }
 }

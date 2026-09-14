@@ -25,7 +25,7 @@
         <maven.compiler.target>21</maven.compiler.target>
 
         <!-- JDK path (adjust per machine if needed) -->
-        <java.home>/usr/lib/jvm/jdk-24.0.2-oracle-x64</java.home>
+        <java.home>/usr/lib/jvm/jdk-21.0.9-oracle-x64</java.home>
     </properties>
 
     <!-- === DEFAULT DEPENDENCIES (platform-independent) === -->
@@ -163,6 +163,7 @@
                     <source>21</source>
                     <target>21</target>
                     <fork>true</fork>
+                    <executable>${java.home}/bin/javac</executable>
                 </configuration>
             </plugin>
 
@@ -195,9 +196,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <skipTests>false</skipTests>
                     <jvm>${java.home}/bin/java</jvm>
-                    <argLine>--enable-preview</argLine>
                 </configuration>
             </plugin>
         </plugins>

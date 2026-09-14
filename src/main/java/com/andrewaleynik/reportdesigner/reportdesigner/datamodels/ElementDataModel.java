@@ -11,11 +11,11 @@ import javafx.collections.ObservableList;
 import java.io.File;
 import java.util.Optional;
 
-public class ElementDataModel {
-    private final ObservableList<Element> elements = FXCollections.observableArrayList();
+public class ElementDataModel extends ObservableDataModel {
+
     private final ObservableList<Element> rootElements = FXCollections.observableArrayList();
-    private Element selectedParentElement;
     private final ObservableList<ElementType> elementTypes = FXCollections.observableArrayList();
+    private Element selectedParentElement;
     private ElementType newElementType;
     private Element newElement;
     private Element selectedEditElement;
@@ -29,16 +29,16 @@ public class ElementDataModel {
         refreshRootElements();
     }
 
-    public ObservableList<Element> getElements() {
-        return elements;
-    }
-
     public ObservableList<Element> getRootElements() {
         return rootElements;
     }
 
     public Element getSelectedParentElement() {
         return selectedParentElement;
+    }
+
+    public void setSelectedParentElement(Element parent) {
+        selectedParentElement = parent;
     }
 
     public ObservableList<ElementType> getElementTypes() {
@@ -57,38 +57,24 @@ public class ElementDataModel {
         return selectedEditElement;
     }
 
-    public ElementService getElementService() {
-        return elementService;
+    public void setSelectedEditElement(Element editElement) {
+        this.selectedEditElement = editElement;
     }
 
     public void refreshRootElements() {
         rootElements.setAll(elementService.getRootElements());
-    }
-
-    public void refreshSelectedParentElement(Element parent) {
-        selectedParentElement = parent;
+        fireChanged();
     }
 
     public void refreshElementTypes() {
         elementTypes.setAll(elementService.getAllElementTypes());
-    }
-
-    public void refreshNewElementType(ElementType elementType) {
-        this.newElementType = elementType;
-    }
-
-    public void refreshNewElement(Element element) {
-        this.newElement = element;
-    }
-
-    public void refreshSelectedEditElement(Element editElement) {
-        this.selectedEditElement = editElement;
+        fireChanged();
     }
 
     public void saveElement(Element element) {
         elementService.saveElement(element);
+        newElement = element;
         refreshRootElements();
-        refreshNewElement(element);
     }
 
     public void updateElement(Element element) {
@@ -98,10 +84,12 @@ public class ElementDataModel {
 
     public void deleteElement(Element element) {
         elementService.deleteElement(element);
+        fireChanged();
     }
 
     public void saveElementType(ElementType elementType) {
         elementService.saveElementType(elementType);
+        newElementType = elementType;
         refreshElementTypes();
     }
 
@@ -110,6 +98,9 @@ public class ElementDataModel {
     }
 
     public Optional<Element> findElementByQuality(ElementQuality quality) {
+        if (quality == null || quality.getId() == null) {
+            return Optional.empty();
+        }
         return elementService.findElementByQualityId(quality.getId());
     }
 }

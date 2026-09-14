@@ -2,7 +2,6 @@ package com.andrewaleynik.reportdesigner.reportdesigner.datamodels;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.domains.PropertyValueDomain;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.*;
-import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementQualityService;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.ElementService;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.PropertyService;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.PropertyValueService;
@@ -12,25 +11,22 @@ import javafx.collections.ObservableList;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PropertyDataModel {
+public class PropertyDataModel extends ObservableDataModel {
+
     private Property editingProperty;
     private final ObservableList<PropertyUnit> propertyUnits = FXCollections.observableArrayList();
     private PropertyUnit newPropertyUnit;
-
     private final ObservableList<Property> currentProperties = FXCollections.observableArrayList();
     private final Set<Property> inheritedProperties = new HashSet<>();
     private final ObservableList<Property> parentProperties = FXCollections.observableArrayList();
     private final ElementService elementService;
-    private final ElementQualityService elementQualityService;
     private final PropertyService propertyService;
     private final PropertyValueService propertyValueService;
 
     public PropertyDataModel(ElementService elementService,
-                             ElementQualityService elementQualityService,
                              PropertyService propertyService,
                              PropertyValueService propertyValueService) {
         this.elementService = elementService;
-        this.elementQualityService = elementQualityService;
         this.propertyService = propertyService;
         this.propertyValueService = propertyValueService;
         refreshPropertyUnits();
@@ -48,13 +44,8 @@ public class PropertyDataModel {
         return newPropertyUnit;
     }
 
-    public List<PropertyValue> getPropertyValuesOfProperty(Property property) {
-        return propertyValueService.getPropertyValueOfProperty(property);
-    }
-
     public List<PropertyValue> getPropertyValuesOfQuality(ElementQuality quality) {
-        Set<Property> qualityProperties = quality.getProperties();
-        return qualityProperties.stream()
+        return quality.getProperties().stream()
                 .map(propertyValueService::getPropertyValueOfProperty)
                 .flatMap(Collection::stream)
                 .toList();
@@ -72,20 +63,18 @@ public class PropertyDataModel {
         return parentProperties;
     }
 
-    public void refreshEditingProperty(Property property) {
+    public void setEditingProperty(Property property) {
         editingProperty = property;
     }
 
     public void refreshPropertyUnits() {
         propertyUnits.setAll(propertyService.getPropertyUnits());
+        fireChanged();
     }
 
-    public void refreshNewPropertyUnit(PropertyUnit propertyUnit) {
-        newPropertyUnit = propertyUnit;
-    }
-
-    public void refreshCurrentProperties(Set<Property> properties) {
+    public void setCurrentProperties(Set<Property> properties) {
         currentProperties.setAll(properties);
+        fireChanged();
     }
 
     public void refreshParentProperties(ElementQuality childQuality) {
@@ -98,6 +87,7 @@ public class PropertyDataModel {
     public void saveProperty(Property property) {
         currentProperties.add(property);
         propertyService.saveProperty(property);
+        fireChanged();
     }
 
     public void savePropertyValues(PropertyValueDomain propertyValueDomain) {
@@ -108,59 +98,44 @@ public class PropertyDataModel {
             throw new IllegalArgumentException("Property and ExternalInfluence must not be null");
         }
 
-        // Проходим по всем уровням в домене
         for (Map.Entry<ExternalInfluenceLevel, PropertyValueDomain.Pair> entry :
                 propertyValueDomain.getAllLevelPairs().entrySet()) {
 
             ExternalInfluenceLevel level = entry.getKey();
             PropertyValueDomain.Pair pair = entry.getValue();
 
-            PropertyValue propertyValue;
-
             if (pair.id() == null) {
-                // Создаем новый PropertyValue
-                propertyValue = new PropertyValue();
+                PropertyValue propertyValue = new PropertyValue();
                 propertyValue.setProperty(property);
                 propertyValue.setExternalInfluence(influence);
                 propertyValue.setExternalInfluenceLevel(level);
                 propertyValue.setValue(pair.value());
-
-                // Сохраняем и получаем ID
                 propertyValueService.savePropertyValue(propertyValue);
-
-                // Обновляем домен с новым ID
                 propertyValueDomain.setLevelPair(level, propertyValue.getId(), pair.value());
-
             } else {
-                // Обновляем существующий PropertyValue
-                propertyValue = propertyValueService.getPropertyValueOfProperty(property).stream()
+                PropertyValue propertyValue = propertyValueService.getPropertyValueOfProperty(property).stream()
                         .filter(pv -> pv.getExternalInfluenceLevel().equals(level))
                         .findFirst()
-                        .orElseGet(() -> null);
+                        .orElse(null);
                 if (propertyValue != null) {
                     propertyValue.setValue(pair.value());
                     propertyValue.setExternalInfluence(influence);
                     propertyValue.setExternalInfluenceLevel(level);
-
                     propertyValueService.updatePropertyValue(propertyValue);
                 }
             }
         }
+        fireChanged();
     }
 
     public void updateProperty(ElementQuality quality, Property property) {
         propertyService.updateProperty(property);
-        refreshCurrentProperties(quality.getProperties());
-    }
-
-    public void deleteProperty(Property property) {
-        currentProperties.remove(property);
-        propertyService.deleteProperty(property);
+        setCurrentProperties(quality.getProperties());
     }
 
     public void savePropertyUnit(PropertyUnit propertyUnit) {
         propertyService.savePropertyUnit(propertyUnit);
-        refreshNewPropertyUnit(propertyUnit);
+        newPropertyUnit = propertyUnit;
         refreshPropertyUnits();
     }
 
@@ -182,7 +157,7 @@ public class PropertyDataModel {
             return Collections.emptySet();
         }
         Element parentElement = elementOptional.get().getParent();
-        if (parentElement == null) {
+        if (parentElement == null || parentElement.getQuality() == null) {
             return Collections.emptySet();
         }
         return parentElement.getQuality().getProperties();

@@ -4,24 +4,21 @@ import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.PropertyDataMo
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Property;
-import javafx.beans.property.SimpleStringProperty;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.JavaFxControls;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 
-public class InheritPropertyFormController {
+public class InheritPropertyFormController extends AbstractDialogController {
+
     private final QualityDataModel qualityDataModel;
     private final PropertyDataModel propertyDataModel;
     @FXML
-    private Label parentQualityLabel;
-    @FXML
     private TableView<Property> parentPropertiesTableView;
-    @FXML
-    private Button okButton;
-    private boolean saved = false;
-    private Stage dialogStage;
 
     private static class ToggleButton extends Button {
         private final String[] stateNames;
@@ -35,9 +32,8 @@ public class InheritPropertyFormController {
         }
 
         public void toggle() {
-            currentState++;
-            currentState %= statesCount;
-            this.textProperty().set(stateNames[currentState]);
+            currentState = (currentState + 1) % statesCount;
+            setText(stateNames[currentState]);
         }
 
         public int getCurrentState() {
@@ -56,76 +52,39 @@ public class InheritPropertyFormController {
         initializeParentPropertiesTableView();
     }
 
-    public void setDialogStage(Stage stage) {
-        this.dialogStage = stage;
-    }
-
     @FXML
     public void handleOk() {
-        saved = true;
         addInheritedProperties();
         propertyDataModel.clearInheritedProperties();
-        closeDialog();
+        markSavedAndClose();
     }
 
     @FXML
     public void handleCancel() {
-        saved = false;
-        closeDialog();
-    }
-
-    public boolean isSaved() {
-        return saved;
-    }
-
-    private void closeDialog() {
-        if (dialogStage != null) {
-            dialogStage.close();
-        }
+        markCancelledAndClose();
     }
 
     private void initializeParentPropertiesTableView() {
-        TableColumn<Property, String> unitColumn = new TableColumn<>("Единица измерения");
-        unitColumn.setCellValueFactory(cellData -> {
-            Property property = cellData.getValue();
-            if (property.getUnit() != null) {
-                return new SimpleStringProperty(property.getUnit().getName());
-            } else {
-                return new SimpleStringProperty("");
-            }
-        });
-        unitColumn.setCellFactory(column -> new TableCell<Property, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item);
-                }
-            }
-        });
+        TableColumn<Property, String> unitColumn = JavaFxControls.textColumn("Единица измерения",
+                property -> property.getUnit() != null ? property.getUnit().getName() : "");
+        TableColumn<Property, String> criterionValueColumn = JavaFxControls.textColumn(
+                "Критерий потребительского качества", Property::getQualityCriterionValue);
+        TableColumn<Property, Void> actionsColumn = createInheritActionsColumn();
 
-        TableColumn<Property, String> criterionValueColumn = new TableColumn<>("Критерий потребительского качества");
-        criterionValueColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getQualityCriterionValue()));
-        criterionValueColumn.setCellFactory(column -> new TableCell<Property, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item);
-                }
-            }
-        });
+        unitColumn.setPrefWidth(150);
+        criterionValueColumn.setPrefWidth(150);
+        actionsColumn.setPrefWidth(100);
 
+        parentPropertiesTableView.getColumns().setAll(unitColumn, criterionValueColumn, actionsColumn);
+        JavaFxControls.configureConstrainedTable(parentPropertiesTableView);
+        propertyDataModel.refreshParentProperties(qualityDataModel.getSelectedQuality());
+        parentPropertiesTableView.setItems(propertyDataModel.getParentProperties());
+    }
+
+    private TableColumn<Property, Void> createInheritActionsColumn() {
         TableColumn<Property, Void> actionsColumn = new TableColumn<>("Действия");
-        actionsColumn.setCellFactory(column -> new TableCell<>() {
-            private final ToggleButton inheritCancelButton = new ToggleButton(
-                    "Наследовать", "Отменить"
-            );
+        actionsColumn.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
+            private final ToggleButton inheritCancelButton = new ToggleButton("Наследовать", "Отменить");
 
             {
                 inheritCancelButton.setStyle("-fx-font-size: 10px; -fx-padding: 2 5;");
@@ -152,16 +111,7 @@ public class InheritPropertyFormController {
                 }
             }
         });
-
-        unitColumn.setPrefWidth(150);
-        criterionValueColumn.setPrefWidth(150);
-        actionsColumn.setPrefWidth(100);
-
-        parentPropertiesTableView.getColumns().clear();
-        parentPropertiesTableView.getColumns().addAll(unitColumn, criterionValueColumn, actionsColumn);
-        parentPropertiesTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_NEXT_COLUMN);
-        propertyDataModel.refreshParentProperties(qualityDataModel.getSelectedQuality());
-        parentPropertiesTableView.setItems(propertyDataModel.getParentProperties());
+        return actionsColumn;
     }
 
     private void addInheritedProperties() {

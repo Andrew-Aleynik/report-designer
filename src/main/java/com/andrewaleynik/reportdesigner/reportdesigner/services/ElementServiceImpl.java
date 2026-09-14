@@ -4,6 +4,7 @@ import com.andrewaleynik.reportdesigner.reportdesigner.dao.ElementDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.ElementTypeDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementType;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.ElementTreeBuilder;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -34,11 +35,7 @@ public class ElementServiceImpl implements ElementService {
             throw new IllegalArgumentException("Root element cannot be null");
         }
 
-        TreeSet<Element> treeSet = new TreeSet<>(Comparator.comparing(Element::getLevel)
-                .thenComparing(Element::getName));
-
-        buildTree(rootElement, treeSet);
-        return treeSet;
+        return ElementTreeBuilder.buildFromRoot(rootElement);
     }
 
     @Override
@@ -71,8 +68,12 @@ public class ElementServiceImpl implements ElementService {
 
     @Override
     public Optional<Element> findElementByQualityId(Long qualityId) {
+        if (qualityId == null) {
+            return Optional.empty();
+        }
         return elementDao.findAll().stream()
-                .filter(element -> element.getQuality().getId().equals(qualityId))
+                .filter(element -> element.getQuality() != null
+                        && qualityId.equals(element.getQuality().getId()))
                 .findFirst();
     }
 
@@ -112,28 +113,17 @@ public class ElementServiceImpl implements ElementService {
 
     @Override
     public void deleteElement(Element element) {
-        Optional<Element> existingElement = elementDao.findById(element.getId());
-        if (existingElement.isEmpty()) {
-            throw new IllegalArgumentException("Element with id " + element.getId() + " not found");
-        }
+        Element existing = elementDao.findById(element.getId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Element with id " + element.getId() + " not found"));
 
-        if (element.getParent() != null) {
-            deleteCascade(element.getParent());
+        Element parent = existing.getParent();
+        if (parent != null) {
+            parent.getChildren().remove(existing);
+            elementDao.update(parent);
         } else {
-            deleteCascade(element);
-            elementDao.delete(element);
+            elementDao.delete(existing);
         }
-    }
-
-    private void deleteCascade(Element element) {
-        List<Element> childrenCopy = new ArrayList<>(element.getChildren());
-        for (Element child: childrenCopy) {
-            element.getChildren().remove(child);
-            child.setParent(null);
-            deleteCascade(child);
-        }
-
-        elementDao.update(element);
     }
 
     @Override
@@ -144,16 +134,6 @@ public class ElementServiceImpl implements ElementService {
                     .map(v -> v.getPropertyPath() + ": " + v.getMessage())
                     .collect(Collectors.joining("; "));
             throw new IllegalArgumentException("Validation failed: " + errors);
-        }
-    }
-
-    private void buildTree(Element element, TreeSet<Element> treeSet) {
-        treeSet.add(element);
-
-        if (element.getChildren() != null && !element.getChildren().isEmpty()) {
-            for (Element child : element.getChildren()) {
-                buildTree(child, treeSet);
-            }
         }
     }
 

@@ -1,11 +1,11 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.services;
 
-import com.andrewaleynik.reportdesigner.reportdesigner.App;
-import com.andrewaleynik.reportdesigner.reportdesigner.models.*;
-import com.itextpdf.io.font.PdfEncodings;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
+import com.andrewaleynik.reportdesigner.reportdesigner.services.pdf.PdfFontLoader;
+import com.andrewaleynik.reportdesigner.reportdesigner.services.pdf.QualityPropertiesTableBuilder;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.font.PdfFont;
-import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -17,17 +17,19 @@ import com.itextpdf.layout.properties.UnitValue;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.TreeSet;
+
+import static com.andrewaleynik.reportdesigner.reportdesigner.App.FontPaths.ARIAL;
+import static com.andrewaleynik.reportdesigner.reportdesigner.App.FontPaths.ARIAL_BOLD_ITALIC;
 
 public class ElementsTreePdfExportService implements ExportService<TreeSet<Element>> {
-    private final PropertyValueService propertyValueService;
+
+    private final QualityPropertiesTableBuilder propertiesTableBuilder;
 
     public ElementsTreePdfExportService(PropertyValueService propertyValueService) {
-        this.propertyValueService = propertyValueService;
+        this.propertiesTableBuilder = new QualityPropertiesTableBuilder(propertyValueService);
     }
 
     @Override
@@ -40,21 +42,17 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
             File tempFile = File.createTempFile("system_", ".pdf");
             tempFile.deleteOnExit();
 
-            String filePath = tempFile.getAbsolutePath();
-            PdfWriter writer = new PdfWriter(filePath);
+            PdfWriter writer = new PdfWriter(tempFile.getAbsolutePath());
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf);
 
-            PdfFont headerFont = loadFont(App.FontPaths.ARIAL_BOLD_ITALIC);
-            PdfFont normalFont = loadFont(App.FontPaths.ARIAL);
-            PdfFont boldFont = loadFont(App.FontPaths.ARIAL_BOLD_ITALIC);
+            PdfFont headerFont = loadFont(ARIAL_BOLD_ITALIC);
+            PdfFont normalFont = loadFont(ARIAL);
+            PdfFont boldFont = loadFont(ARIAL_BOLD_ITALIC);
 
             addReportHeader(document, headerFont, normalFont);
-
             addTreeStatistics(document, elementsTree, boldFont, normalFont);
-
             document.add(new Paragraph("\n"));
-
             addElementsTree(document, elementsTree, headerFont, normalFont, boldFont);
 
             document.close();
@@ -66,27 +64,18 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
     }
 
     private void addReportHeader(Document document, PdfFont headerFont, PdfFont normalFont) {
-        Paragraph title = new Paragraph("Отчет по системе")
+        document.add(new Paragraph("Отчет по системе")
                 .setFont(headerFont)
                 .setFontSize(18)
                 .setTextAlignment(TextAlignment.CENTER)
-                .setMarginBottom(10);
-        document.add(title);
+                .setMarginBottom(10));
 
-        Paragraph date = new Paragraph("Создан: " +
+        document.add(new Paragraph("Создан: " +
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")))
                 .setFont(normalFont)
                 .setFontSize(10)
                 .setTextAlignment(TextAlignment.RIGHT)
-                .setMarginBottom(30);
-        document.add(date);
-
-        Paragraph subtitle = new Paragraph("Элементы системы")
-                .setFont(headerFont)
-                .setFontSize(14)
-                .setTextAlignment(TextAlignment.LEFT)
-                .setMarginBottom(20);
-        document.add(subtitle);
+                .setMarginBottom(30));
     }
 
     private void addTreeStatistics(Document document, TreeSet<Element> elementsTree,
@@ -99,7 +88,8 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
 
         addStatRow(statsTable, "Общее количество элементов:", String.valueOf(totalElements), boldFont, normalFont);
         addStatRow(statsTable, "Элементов с качеством:", String.valueOf(elementsWithQuality), boldFont, normalFont);
-        addStatRow(statsTable, "Элементов без качества:", String.valueOf(totalElements - elementsWithQuality), boldFont, normalFont);
+        addStatRow(statsTable, "Элементов без качества:",
+                String.valueOf(totalElements - elementsWithQuality), boldFont, normalFont);
 
         document.add(statsTable);
     }
@@ -108,22 +98,6 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
         return (int) elements.stream()
                 .filter(element -> element.getQuality() != null)
                 .count();
-    }
-
-    private int calculateMaxDepth(TreeSet<Element> elements) {
-        int maxDepth = 0;
-        for (Element element : elements) {
-            maxDepth = Math.max(maxDepth, calculateElementDepth(element, 1));
-        }
-        return maxDepth;
-    }
-
-    private int calculateElementDepth(Element element, int currentDepth) {
-        int maxDepth = currentDepth;
-        for (Element child : element.getChildren()) {
-            maxDepth = Math.max(maxDepth, calculateElementDepth(child, currentDepth + 1));
-        }
-        return maxDepth;
     }
 
     private void addStatRow(Table table, String label, String value, PdfFont labelFont, PdfFont valueFont) {
@@ -140,16 +114,15 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
 
     private void addElementWithHierarchy(Document document, Element element,
                                          PdfFont headerFont, PdfFont normalFont, PdfFont boldFont,
-                                         int level) throws IOException {
+                                         int level) {
         int indent = level * 15;
 
-        Paragraph elementParagraph = new Paragraph(element.getName())
+        document.add(new Paragraph(element.getName())
                 .setFont(level == 0 ? headerFont : boldFont)
                 .setFontSize(14)
                 .setMarginLeft(indent)
                 .setMarginTop(level == 0 ? 10 : 5)
-                .setMarginBottom(3);
-        document.add(elementParagraph);
+                .setMarginBottom(3));
 
         addElementDetails(document, element, normalFont, indent);
 
@@ -177,13 +150,12 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
     }
 
     private void addQualityDetails(Document document, ElementQuality quality,
-                                   PdfFont normalFont, PdfFont boldFont, int indent) throws IOException {
-        Paragraph qualityLabel = new Paragraph("Качество: " + quality.getCode())
+                                   PdfFont normalFont, PdfFont boldFont, int indent) {
+        document.add(new Paragraph("Качество: " + quality.getCode())
                 .setFont(boldFont)
                 .setFontSize(10)
                 .setMarginLeft(indent)
-                .setMarginBottom(3);
-        document.add(qualityLabel);
+                .setMarginBottom(3));
 
         Table qualityTable = new Table(UnitValue.createPercentArray(new float[]{40, 60}));
         qualityTable.setWidth(UnitValue.createPercentValue(70));
@@ -194,12 +166,10 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
             addDetailRow(qualityTable, "Срок службы:",
                     quality.getServiceLife().toDays() + " дней", normalFont);
         }
-
         if (quality.getSatisfyingCost() != null) {
             addDetailRow(qualityTable, "Удовл. стоимость:",
                     quality.getSatisfyingCost().toString(), normalFont);
         }
-
         if (quality.getActualCost() != null) {
             addDetailRow(qualityTable, "Факт. стоимость:",
                     quality.getActualCost().toString(), normalFont);
@@ -208,111 +178,9 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
         document.add(qualityTable);
 
         if (quality.getProperties() != null && !quality.getProperties().isEmpty()) {
-            addQualityProperties(document, quality, normalFont, boldFont, indent);
+            document.add(propertiesTableBuilder.createSectionHeader(boldFont, indent));
+            document.add(propertiesTableBuilder.build(quality, normalFont, boldFont, indent));
         }
-    }
-
-    private void addQualityProperties(Document document, ElementQuality quality,
-                                      PdfFont normalFont, PdfFont boldFont, int indent) throws IOException {
-
-        // Заголовок раздела свойств
-        Paragraph propsHeader = new Paragraph("Свойства качества")
-                .setFont(boldFont)
-                .setFontSize(11)
-                .setMarginLeft(indent)
-                .setMarginBottom(5);
-        document.add(propsHeader);
-
-        // Получаем PropertyValues для этого качества
-        List<PropertyValue> propertyValues = quality.getProperties().stream()
-                .map(propertyValueService::getPropertyValueOfProperty)
-                .flatMap(List::stream)
-                .toList();
-
-        // Группируем по Property
-        Map<Property, List<PropertyValue>> valuesByProperty = propertyValues.stream()
-                .collect(Collectors.groupingBy(PropertyValue::getProperty));
-
-        // Таблица: Property | ExternalInfluence | Уровни и значения
-        Table propsTable = new Table(UnitValue.createPercentArray(new float[]{25, 25, 50}));
-        propsTable.setWidth(UnitValue.createPercentValue(90));
-        propsTable.setMarginLeft(indent);
-        propsTable.setMarginBottom(15);
-
-        // Заголовки
-        propsTable.addHeaderCell(createCell("Свойство", boldFont, true, TextAlignment.CENTER));
-        propsTable.addHeaderCell(createCell("Внешнее воздействие", boldFont, true, TextAlignment.CENTER));
-        propsTable.addHeaderCell(createCell("Значения по уровням", boldFont, true, TextAlignment.CENTER));
-
-        // Данные
-        for (Property property : quality.getProperties()) {
-            List<PropertyValue> values = valuesByProperty.getOrDefault(property, Collections.emptyList());
-
-            // Группируем значения по ExternalInfluence
-            Map<ExternalInfluence, List<PropertyValue>> byInfluence = values.stream()
-                    .collect(Collectors.groupingBy(
-                            pv -> pv.getExternalInfluence() != null ? pv.getExternalInfluence() :
-                                    new ExternalInfluence() {{
-                                        setName("Без воздействия");
-                                    }}
-                    ));
-
-            if (byInfluence.isEmpty()) {
-                propsTable.addCell(createCell(getPropertyDisplay(property), normalFont, false, TextAlignment.LEFT));
-                propsTable.addCell(createCell("-", normalFont, false, TextAlignment.CENTER));
-                propsTable.addCell(createCell("-", normalFont, false, TextAlignment.CENTER));
-            } else {
-                boolean firstRow = true;
-                for (Map.Entry<ExternalInfluence, List<PropertyValue>> entry : byInfluence.entrySet()) {
-                    ExternalInfluence influence = entry.getKey();
-                    List<PropertyValue> influenceValues = entry.getValue();
-
-                    // Формируем строку значений по уровням
-                    String valuesStr = influenceValues.stream()
-                            .sorted(Comparator.comparing(pv ->
-                                    pv.getExternalInfluenceLevel() != null ?
-                                            pv.getExternalInfluenceLevel().getName() : ""))
-                            .map(pv -> {
-                                String levelName = pv.getExternalInfluenceLevel() != null ?
-                                        pv.getExternalInfluenceLevel().getName() : "Без уровня";
-                                String val = pv.getValue() != null ? pv.getValue() : "-";
-                                return levelName + ": " + val;
-                            })
-                            .collect(Collectors.joining("\n"));
-
-                    if (firstRow) {
-                        // Первая строка — с названием свойства
-                        propsTable.addCell(createCell(getPropertyDisplay(property), normalFont, false, TextAlignment.LEFT));
-                        firstRow = false;
-                    } else {
-                        // Продолжение — пустая ячейка (объединение по вертикали будет ниже)
-                        propsTable.addCell(createCell("", normalFont, false, TextAlignment.LEFT));
-                    }
-
-                    propsTable.addCell(createCell(
-                            influence.getName() != null ? influence.getName() : "-",
-                            normalFont, false, TextAlignment.LEFT));
-                    propsTable.addCell(createCell(valuesStr, normalFont, false, TextAlignment.LEFT));
-                }
-            }
-        }
-
-        document.add(propsTable);
-    }
-
-    // Вспомогательный метод для отображения Property
-    private String getPropertyDisplay(Property property) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("ID: ").append(property.getId());
-
-        if (property.getUnit() != null) {
-            sb.append("\nЕд.изм.: ").append(property.getUnit().getName());
-        }
-        if (property.getQualityCriterionValue() != null) {
-            sb.append("\nКритерий: ").append(property.getQualityCriterionValue());
-        }
-
-        return sb.toString();
     }
 
     private void addDetailRow(Table table, String label, String value, PdfFont font) {
@@ -333,17 +201,7 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
         return cell;
     }
 
-    private String getUnitName(Property property) {
-        return property.getUnit() != null ? property.getUnit().getName() : "-";
-    }
-
     private PdfFont loadFont(String fontPath) throws IOException {
-        try (InputStream fontStream = getClass().getResourceAsStream(fontPath)) {
-            if (fontStream == null) {
-                throw new IOException("Шрифт не найден: " + fontPath);
-            }
-            byte[] fontData = fontStream.readAllBytes();
-            return PdfFontFactory.createFont(fontData, PdfEncodings.IDENTITY_H);
-        }
+        return PdfFontLoader.loadFromClasspath(getClass(), fontPath);
     }
 }

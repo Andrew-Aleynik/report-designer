@@ -4,23 +4,15 @@ import com.andrewaleynik.reportdesigner.reportdesigner.App;
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ExternalInfluencesDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluence;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluenceGroup;
-import com.andrewaleynik.reportdesigner.reportdesigner.util.AlertFactory;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.DialogOpener;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.FormValidators;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.JavaFxControls;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+public class ExternalInfluenceFormController extends AbstractDialogController {
 
-
-public class ExternalInfluenceFormController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalInfluenceFormController.class);
     @FXML
     private TextField nameField;
     @FXML
@@ -29,20 +21,15 @@ public class ExternalInfluenceFormController {
     private ComboBox<ExternalInfluenceGroup> groupComboBox;
     @FXML
     private Button okButton;
-    @FXML
-    private Button cancelButton;
-    private boolean isEditMode = false;
-    private boolean saved;
-    private Stage dialogStage;
+
+    private final boolean isEditMode;
     private final ExternalInfluence editingExternalInfluence;
     private final ExternalInfluencesDataModel externalInfluencesDataModel;
 
     public ExternalInfluenceFormController(ExternalInfluencesDataModel externalInfluencesDataModel) {
         this.externalInfluencesDataModel = externalInfluencesDataModel;
         this.editingExternalInfluence = externalInfluencesDataModel.getSelectedExternalInfluence();
-        if (editingExternalInfluence != null) {
-            isEditMode = true;
-        }
+        this.isEditMode = editingExternalInfluence != null;
     }
 
     @FXML
@@ -54,81 +41,43 @@ public class ExternalInfluenceFormController {
         nameField.textProperty().addListener(propertyChangeListener());
         descriptionField.textProperty().addListener(propertyChangeListener());
         groupComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
-        groupComboBox.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(ExternalInfluenceGroup item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getName());
-                }
-            }
-        });
 
-        groupComboBox.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(ExternalInfluenceGroup item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getName());
-                }
-            }
-        });
-
+        JavaFxControls.bindComboBoxDisplay(groupComboBox, ExternalInfluenceGroup::getName);
         groupComboBox.setItems(externalInfluencesDataModel.getExternalInfluenceGroups());
-
         updateOkButtonState();
     }
 
     @FXML
     public void showAddGroupForm() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(App.FxmlPaths.ADD_EXTERNAL_INFLUENCE_GROUP_FORM));
-            loader.setControllerFactory(App.getControllerFactory());
-            Parent root = loader.load();
-            ExternalInfluenceGroupFormController controller = loader.getController();
-
-            Stage dialogStageChild = new Stage();
-            dialogStageChild.setTitle("Добавление группы внешних воздействий");
-            dialogStageChild.initModality(Modality.APPLICATION_MODAL);
-            dialogStageChild.initOwner(groupComboBox.getScene().getWindow());
-            dialogStageChild.setScene(new Scene(root));
-            dialogStageChild.setResizable(false);
-
-            controller.setDialogStage(dialogStageChild);
-
-            dialogStageChild.showAndWait();
-
-            if (controller.isSaved()) {
-                groupComboBox.getSelectionModel().select(externalInfluencesDataModel.getNewExternalInfluenceGroup());
+        DialogOpener.<ExternalInfluenceGroupFormController>open(
+                App.FxmlPaths.ADD_EXTERNAL_INFLUENCE_GROUP_FORM,
+                "Добавление группы внешних воздействий",
+                groupComboBox
+        ).ifPresent(result -> {
+            if (result.saved()) {
+                groupComboBox.getSelectionModel().select(
+                        externalInfluencesDataModel.getNewExternalInfluenceGroup());
             }
-        } catch (IOException e) {
-            LOGGER.error("Error opening form: {}", e.getMessage(), e);
-            AlertFactory.showError("Ошибка при открытии формы", e.getMessage());
-        }
+        });
     }
 
     @FXML
     public void handleOk() {
-        boolean isValid = !validateForm();
-        if (isValid) {
-            if (!isEditMode) {
-                createNewExternalInfluence();
-            } else {
-                updateExistingExternalInfluence();
-            }
-            saved = true;
-            closeDialog();
+        if (isFormInvalid()) {
+            return;
         }
+
+        if (isEditMode) {
+            updateExistingExternalInfluence();
+        } else {
+            createNewExternalInfluence();
+        }
+        markSavedAndClose();
     }
 
     @FXML
     public void handleCancel() {
-        saved = false;
-        closeDialog();
+        markCancelledAndClose();
     }
 
     private void populateFormWithExternalInfluenceData() {
@@ -153,30 +102,14 @@ public class ExternalInfluenceFormController {
     }
 
     private void updateOkButtonState() {
-        boolean isNotValid = validateForm();
-        okButton.setDisable(isNotValid);
+        okButton.setDisable(isFormInvalid());
     }
 
-    private boolean validateForm() {
-        String name = nameField.getText();
-        return name == null || name.trim().isEmpty();
+    private boolean isFormInvalid() {
+        return FormValidators.isBlank(nameField.getText());
     }
 
-    private void closeDialog() {
-        if (dialogStage != null) {
-            dialogStage.close();
-        }
-    }
-
-    private ChangeListener<? super String> propertyChangeListener() {
+    private ChangeListener<String> propertyChangeListener() {
         return (obs, oldVal, newVal) -> updateOkButtonState();
-    }
-
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
-    }
-
-    public boolean isSaved() {
-        return saved;
     }
 }

@@ -22,7 +22,8 @@ public class BaseTest {
             var idField = entity.getClass().getMethod("getId");
             Object id = idField.invoke(entity);
             assertThat(id).isNotNull();
-        } catch (Exception e) {
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError("Failed to verify entity id", e);
         }
     }
 }

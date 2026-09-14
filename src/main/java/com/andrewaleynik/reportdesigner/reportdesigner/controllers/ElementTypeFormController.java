@@ -2,20 +2,19 @@ package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.ElementDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementType;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.FormValidators;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
-public class ElementTypeFormController {
+public class ElementTypeFormController extends AbstractDialogController {
+
     private final ElementDataModel elementDataModel;
 
     @FXML
     private TextField nameField;
     @FXML
     private Button okButton;
-    private boolean saved = false;
-    private Stage dialogStage;
 
     public ElementTypeFormController(ElementDataModel elementDataModel) {
         this.elementDataModel = elementDataModel;
@@ -23,52 +22,32 @@ public class ElementTypeFormController {
 
     @FXML
     public void initialize() {
-        nameField.textProperty().addListener((obs, oldVal, newVal) -> {
-            updateOkButtonState();
-        });
+        nameField.textProperty().addListener((obs, oldVal, newVal) -> updateOkButtonState());
         updateOkButtonState();
-    }
-
-    private void updateOkButtonState() {
-        boolean isNotValid = validateForm();
-        okButton.setDisable(isNotValid);
     }
 
     @FXML
     public void handleOk() {
-        boolean isValid = !validateForm();
-        if (isValid) {
-            ElementType elementType = new ElementType();
-            elementType.setName(nameField.getText());
-            elementDataModel.saveElementType(elementType);
-            elementDataModel.refreshNewElementType(elementType);
-            saved = true;
-            closeDialog();
+        if (isFormInvalid()) {
+            return;
         }
+
+        ElementType elementType = new ElementType();
+        elementType.setName(nameField.getText());
+        elementDataModel.saveElementType(elementType);
+        markSavedAndClose();
     }
 
     @FXML
     public void handleCancel() {
-        saved = false;
-        closeDialog();
+        markCancelledAndClose();
     }
 
-    private boolean validateForm() {
-        String name = nameField.getText();
-        return name == null || name.trim().isEmpty();
+    private void updateOkButtonState() {
+        okButton.setDisable(isFormInvalid());
     }
 
-    private void closeDialog() {
-        if (dialogStage != null) {
-            dialogStage.close();
-        }
-    }
-
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
-    }
-
-    public boolean isSaved() {
-        return saved;
+    private boolean isFormInvalid() {
+        return FormValidators.isBlank(nameField.getText());
     }
 }

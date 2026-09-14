@@ -21,7 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
-public class PreviewController {
+public class PreviewController implements DialogController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewController.class);
     private Stage dialogStage;
     private File currentPdfFile;
@@ -29,8 +29,14 @@ public class PreviewController {
     @FXML
     private VBox pagesContainer;
 
+    @Override
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
+    }
+
+    @Override
+    public boolean isSaved() {
+        return false;
     }
 
     public void setPdfFile(File pdfFile) {
@@ -112,10 +118,6 @@ public class PreviewController {
     }
 
     @FXML
-    public void handlePrint() {
-    }
-
-    @FXML
     public void handleClose() {
         if (currentPdfFile != null && currentPdfFile.exists()) {
             Optional<ButtonType> result = AlertFactory.showConfirmation(
@@ -148,19 +150,6 @@ public class PreviewController {
         if (dialogStage != null) {
             dialogStage.close();
         }
-    }
-
-    public void forceClose() {
-        cleanupTempFile();
-        closeDialog();
-    }
-
-    public File getCurrentPdfFile() {
-        return currentPdfFile;
-    }
-
-    public boolean isPdfFileAvailable() {
-        return currentPdfFile != null && currentPdfFile.exists();
     }
 
     private void closeDocument() {

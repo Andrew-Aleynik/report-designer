@@ -2,20 +2,19 @@ package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.datamodels.QualityDataModel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.FormValidators;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
-public class ElementQualityFormController {
+public class ElementQualityFormController extends AbstractDialogController {
+
     private final QualityDataModel qualityDataModel;
+
     @FXML
     private TextField codeField;
     @FXML
     private Button okButton;
-    private boolean saved = false;
-    private Stage dialogStage;
-
 
     public ElementQualityFormController(QualityDataModel qualityDataModel) {
         this.qualityDataModel = qualityDataModel;
@@ -27,45 +26,28 @@ public class ElementQualityFormController {
         updateOkButtonState();
     }
 
-    private void updateOkButtonState() {
-        boolean isNotValid = validateForm();
-        okButton.setDisable(isNotValid);
-    }
-
     @FXML
     public void handleOk() {
-        boolean isValid = !validateForm();
-        if (isValid) {
-            ElementQuality elementQuality = new ElementQuality();
-            elementQuality.setCode(codeField.getText());
-            qualityDataModel.saveQuality(elementQuality);
-            saved = true;
-            closeDialog();
+        if (isFormInvalid()) {
+            return;
         }
+
+        ElementQuality elementQuality = new ElementQuality();
+        elementQuality.setCode(codeField.getText());
+        qualityDataModel.saveQuality(elementQuality);
+        markSavedAndClose();
     }
 
     @FXML
     public void handleCancel() {
-        saved = false;
-        closeDialog();
+        markCancelledAndClose();
     }
 
-    private boolean validateForm() {
-        String code = codeField.getText();
-        return code == null || code.trim().isEmpty() || code.trim().length() < 3;
+    private void updateOkButtonState() {
+        okButton.setDisable(isFormInvalid());
     }
 
-    private void closeDialog() {
-        if (dialogStage != null) {
-            dialogStage.close();
-        }
-    }
-
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
-    }
-
-    public boolean isSaved() {
-        return saved;
+    private boolean isFormInvalid() {
+        return FormValidators.isBlankOrTooShort(codeField.getText(), 3);
     }
 }

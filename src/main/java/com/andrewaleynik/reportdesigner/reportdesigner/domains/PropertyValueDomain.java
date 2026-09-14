@@ -54,21 +54,16 @@ public class PropertyValueDomain {
         }
     }
 
-    public void setLevelPairId(ExternalInfluenceLevel level, Long id) {
-        Pair pair = levelValues.getOrDefault(level, new Pair(null, ""));
-        levelValues.put(level, new Pair(id, pair.value));
-    }
-
     public Map<ExternalInfluenceLevel, Pair> getAllLevelPairs() {
         return new HashMap<>(levelValues);
     }
 
     public String getPropertyDisplay() {
-        return property != null ? (property.getName() + "(" + property.getUnit().getName() + ")") : "";
-    }
-
-    public String getInfluenceDisplay() {
-        return externalInfluence != null ? externalInfluence.getName() : "";
+        if (property == null) {
+            return "";
+        }
+        String unitName = property.getUnit() != null ? property.getUnit().getName() : "-";
+        return property.getName() + " (" + unitName + ")";
     }
 
     @Override
