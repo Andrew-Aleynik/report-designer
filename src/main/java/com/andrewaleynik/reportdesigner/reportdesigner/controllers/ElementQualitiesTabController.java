@@ -265,7 +265,7 @@ public class ElementQualitiesTabController {
                 "Удаление свойства",
                 "Вы уверены, что хотите удалить это свойство?"
         ).ifPresent(response -> {
-            if (response == ButtonType.OK) {
+            if (response == AlertFactory.OK) {
                 ElementQuality currentQuality = qualityDataModel.getSelectedQuality();
                 currentQuality.removeProperty(property);
                 propertyDataModel.setCurrentProperties(currentQuality.getProperties());

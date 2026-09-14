@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Objects;
 
 public class App extends javafx.application.Application {
@@ -56,11 +57,12 @@ public class App extends javafx.application.Application {
 
     @Override
     public void start(Stage primaryStage) {
+        Locale.setDefault(Locale.of("ru", "RU"));
         try {
             initializePrimaryStage(primaryStage);
-            log.info("App started successful");
+            log.info("App started successfully");
         } catch (Exception e) {
-            log.error("Starting critical error: {}", e.getMessage(), e);
+            log.error("Critical startup error: {}", e.getMessage(), e);
             AlertFactory.showError("Ошибка запуска", "Не удалось запустить приложение");
             System.exit(1);
         }
@@ -73,7 +75,7 @@ public class App extends javafx.application.Application {
         Scene scene = new Scene(root, STARTUP_WIDTH, STARTUP_HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.setTitle(APP_NAME);
-        primaryStage.centerOnScreen();
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 

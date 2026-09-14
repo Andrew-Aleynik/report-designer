@@ -15,7 +15,6 @@ import com.andrewaleynik.reportdesigner.reportdesigner.util.DialogOpener;
 import com.andrewaleynik.reportdesigner.reportdesigner.util.JavaFxControls;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
@@ -93,7 +92,7 @@ public class ExternalInfluenceLevelsTabController {
                 "Удаление интенсивности",
                 "Удалить интенсивность \"" + formatLevelDisplay(selectedLevel) + "\"?"
         ).ifPresent(response -> {
-            if (response == ButtonType.OK) {
+            if (response == AlertFactory.OK) {
                 externalInfluencesDataModel.deleteExternalInfluenceLevel(selectedLevel);
                 levelsComboBox.getSelectionModel().clearSelection();
                 updateTables();

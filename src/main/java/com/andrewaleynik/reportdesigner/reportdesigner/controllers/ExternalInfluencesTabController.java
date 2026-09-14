@@ -7,7 +7,6 @@ import com.andrewaleynik.reportdesigner.reportdesigner.util.AlertFactory;
 import com.andrewaleynik.reportdesigner.reportdesigner.util.DialogOpener;
 import com.andrewaleynik.reportdesigner.reportdesigner.util.JavaFxControls;
 import javafx.fxml.FXML;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -83,7 +82,7 @@ public class ExternalInfluencesTabController {
                 "Удаление внешнего воздействия",
                 "Вы уверены, что хотите удалить это внешнее воздействие?"
         ).ifPresent(response -> {
-            if (response == ButtonType.OK && externalInfluence != null) {
+            if (response == AlertFactory.OK && externalInfluence != null) {
                 externalInfluencesDataModel.deleteExternalInfluence(externalInfluence);
             }
         });

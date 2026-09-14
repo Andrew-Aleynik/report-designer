@@ -80,8 +80,8 @@ public class PreviewController implements DialogController {
                 pagesContainer.getChildren().addAll(pageLabel, imageView);
             }
         } catch (Exception e) {
-            AlertFactory.showError("Ошибка рендеринга",
-                    "Не удалось выполнить рендеринг: " + e.getMessage());
+            AlertFactory.showError("Ошибка отображения",
+                    "Не удалось отобразить документ: " + e.getMessage());
         }
     }
 
@@ -95,8 +95,8 @@ public class PreviewController implements DialogController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Сохранить отчет как PDF");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("PDF Files", "*.pdf"),
-                new FileChooser.ExtensionFilter("All Files", "*.*")
+                new FileChooser.ExtensionFilter("Файлы PDF", "*.pdf"),
+                new FileChooser.ExtensionFilter("Все файлы", "*.*")
         );
 
         String defaultFileName = generateDefaultFileName();
@@ -126,7 +126,7 @@ public class PreviewController implements DialogController {
                     "Временный файл будет удален."
             );
 
-            if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (result.isPresent() && result.get() == AlertFactory.OK) {
                 cleanupTempFile();
                 closeDialog();
             }
@@ -157,7 +157,7 @@ public class PreviewController implements DialogController {
             try {
                 currentDocument.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to close PDF document", e);
             }
         }
     }
@@ -167,7 +167,7 @@ public class PreviewController implements DialogController {
             try {
                 currentPdfFile.delete();
             } catch (SecurityException e) {
-                LOGGER.error("Не удалось удалить временный файл: ", e);
+                LOGGER.error("Failed to delete temporary file", e);
             }
         }
     }

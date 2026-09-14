@@ -1,8 +1,8 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.controllers;
 
+import com.andrewaleynik.reportdesigner.reportdesigner.util.AlertFactory;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextArea;
 import javafx.stage.Modality;
@@ -29,7 +29,7 @@ public class MainController {
         dialog.setTitle("Инструкция");
         dialog.setHeaderText("Как пользоваться программой");
         dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.getDialogPane().getButtonTypes().add(AlertFactory.CLOSE);
 
         TextArea textArea = new TextArea(loadInstructionText());
         textArea.setEditable(false);
