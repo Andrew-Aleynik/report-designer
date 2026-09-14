@@ -19,6 +19,13 @@ class ControllerFactoryTest {
     }
 
     @Test
+    void call_WithMainController_ReturnsInstance() {
+        Object controller = controllerFactory.call(MainController.class);
+
+        assertThat(controller).isInstanceOf(MainController.class);
+    }
+
+    @Test
     void call_WithPreviewController_ReturnsInstance() {
         Object controller = controllerFactory.call(PreviewController.class);
 

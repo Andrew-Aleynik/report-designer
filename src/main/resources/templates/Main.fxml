@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<TabPane xmlns="http://javafx.com/javafx"
-         xmlns:fx="http://javafx.com/fxml"
-         tabClosingPolicy="UNAVAILABLE">
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.MainController">
 
-    <!-- Первая вкладка - Дерево элементов -->
-    <Tab text="Структурная модель объекта">
-        <fx:include source="ElementsTreeTab.fxml"/>
-    </Tab>
+    <top>
+        <MenuBar>
+            <Menu text="Файл">
+                <MenuItem text="Выход" onAction="#handleExit"/>
+            </Menu>
+            <Menu text="Справка">
+                <MenuItem text="Инструкция" onAction="#handleInstructions"/>
+            </Menu>
+        </MenuBar>
+    </top>
 
-    <!-- Вторая вкладка - Редактирование качеств и свойств -->
-    <Tab text="Потребительские качества">
-        <fx:include source="QualitiesTab.fxml"/>
-    </Tab>
-
-    <!-- Третья вкладка - Внешние воздействия -->
-    <Tab text="Внешние воздействия">
-        <fx:include source="ExternalInfluenceTab.fxml"/>
-    </Tab>
-
-    <Tab text="Интенсивности внешних воздействий">
-        <fx:include source="ExternalInfluenceLevelsTab.fxml"/>
-    </Tab>
-</TabPane>
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <Tab text="Структурная модель объекта">
+                <fx:include source="ElementsTreeTab.fxml"/>
+            </Tab>
+            <Tab text="Потребительские качества">
+                <fx:include source="QualitiesTab.fxml"/>
+            </Tab>
+            <Tab text="Внешние воздействия">
+                <fx:include source="ExternalInfluenceTab.fxml"/>
+            </Tab>
+            <Tab text="Интенсивности внешних воздействий">
+                <fx:include source="ExternalInfluenceLevelsTab.fxml"/>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>

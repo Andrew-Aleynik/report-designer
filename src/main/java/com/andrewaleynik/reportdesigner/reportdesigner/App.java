@@ -3,6 +3,7 @@ package com.andrewaleynik.reportdesigner.reportdesigner;
 import com.andrewaleynik.reportdesigner.reportdesigner.config.ApplicationContext;
 import com.andrewaleynik.reportdesigner.reportdesigner.config.ControllerFactory;
 import com.andrewaleynik.reportdesigner.reportdesigner.util.AlertFactory;
+import com.andrewaleynik.reportdesigner.reportdesigner.util.HibernateSessionFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -82,6 +83,12 @@ public class App extends javafx.application.Application {
         return loader;
     }
 
+    @Override
+    public void stop() {
+        HibernateSessionFactory.shutdown();
+        log.info("App was shut down");
+    }
+
     public static Callback<Class<?>, Object> getControllerFactory() {
         return controllerFactory;
     }
@@ -92,8 +99,6 @@ public class App extends javafx.application.Application {
             launch(args);
         } catch (Exception e) {
             log.error("Critical exception: {}", e.getMessage(), e);
-        } finally {
-            log.info("App was shut down");
         }
     }
 }

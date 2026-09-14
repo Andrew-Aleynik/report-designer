@@ -22,6 +22,7 @@ public final class ControllerFactory implements Callback<Class<?>, Object> {
     }
 
     private void registerControllers() {
+        registry.put(MainController.class, ctx -> new MainController());
         registry.put(ElementsTreeTabController.class,
                 ctx -> new ElementsTreeTabController(ctx.getElementDataModel()));
         registry.put(ElementQualitiesTabController.class,
