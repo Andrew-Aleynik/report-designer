@@ -19,9 +19,11 @@ jobs:
           - os: ubuntu-latest
             maven_profile: dev-linux
             platform: linux
+            installer_glob: "*.deb"
           - os: windows-latest
             maven_profile: prod-win
             platform: windows
+            installer_glob: "*.exe"
 
     steps:
       - name: Checkout
@@ -34,23 +36,48 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Build package
+      - name: Install Linux packaging tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fakeroot binutils
+
+      - name: Install Windows packaging tools (WiX)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install wixtoolset --version=3.14.1 -y --no-progress
+          $wix = Get-ChildItem "C:\Program Files (x86)\WiX Toolset*" -Directory | Select-Object -First 1
+          if (-not $wix) { throw "WiX Toolset not found after install" }
+          Add-Content -Path $env:GITHUB_PATH -Value "$($wix.FullName)\bin"
+          Write-Host "Added to PATH: $($wix.FullName)\bin"
+
+      - name: Build installer
         run: mvn -B -P${{ matrix.maven_profile }} -Djava.home="$JAVA_HOME" clean package -DskipTests=false
         shell: bash
 
-      - name: Prepare release JAR
+      - name: Prepare release assets
         shell: bash
         run: |
           mkdir -p dist
-          jar_file=$(ls target/*-jar-with-dependencies.jar | head -n 1)
-          cp "$jar_file" "dist/reportdesigner-${{ github.ref_name }}-${{ matrix.platform }}.jar"
+          shopt -s nullglob
+          files=(target/dist/${{ matrix.installer_glob }})
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No installer found in target/dist matching ${{ matrix.installer_glob }}"
+            ls -la target/dist || true
+            exit 1
+          fi
+          for f in "${files[@]}"; do
+            ext="${f##*.}"
+            cp "$f" "dist/ReportDesigner-${{ github.ref_name }}-${{ matrix.platform }}.${ext}"
+          done
           ls -la dist/
 
-      - name: Upload release JAR
+      - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-jar-${{ matrix.platform }}
-          path: dist/*.jar
+          name: release-installer-${{ matrix.platform }}
+          path: dist/*
           if-no-files-found: error
 
   release:
@@ -58,10 +85,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download JARs
+      - name: Download installers
         uses: actions/download-artifact@v4
         with:
-          pattern: release-jar-*
+          pattern: release-installer-*
           path: release-assets
           merge-multiple: true
 

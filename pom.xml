@@ -215,6 +215,7 @@
             <properties>
                 <javafx.platform>linux</javafx.platform>
                 <jpackage.os>linux</jpackage.os>
+                <jpackage.type>deb</jpackage.type>
                 <module.path.separator>:</module.path.separator>
             </properties>
             <dependencies>
@@ -308,6 +309,8 @@
                                             <arg value="--no-man-pages"/>
                                         </exec>
                                         <exec executable="jpackage" failonerror="true">
+                                            <arg value="--type"/>
+                                            <arg value="${jpackage.type}"/>
                                             <arg value="--name"/>
                                             <arg value="ReportDesigner"/>
                                             <arg value="--input"/>
@@ -341,6 +344,7 @@
             <properties>
                 <javafx.platform>win</javafx.platform>
                 <jpackage.os>windows</jpackage.os>
+                <jpackage.type>exe</jpackage.type>
                 <module.path.separator>;</module.path.separator>
                 <java.home>C:\Program Files\Java\jdk-21</java.home>
             </properties>
@@ -435,6 +439,8 @@
                                             <arg value="--no-man-pages"/>
                                         </exec>
                                         <exec executable="jpackage" failonerror="true">
+                                            <arg value="--type"/>
+                                            <arg value="${jpackage.type}"/>
                                             <arg value="--name"/>
                                             <arg value="ReportDesigner"/>
                                             <arg value="--input"/>
@@ -449,6 +455,9 @@
                                             <arg value="${project.build.directory}/dist"/>
                                             <arg value="--app-version"/>
                                             <arg value="${project.version}"/>
+                                            <arg value="--win-dir-chooser"/>
+                                            <arg value="--win-menu"/>
+                                            <arg value="--win-shortcut"/>
                                         </exec>
                                     </target>
                                 </configuration>

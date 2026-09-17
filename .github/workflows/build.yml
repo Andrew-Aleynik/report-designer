@@ -29,8 +29,25 @@ jobs:
           java-version: "21"
           cache: maven
 
+      - name: Install Linux packaging tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fakeroot binutils
+
+      - name: Install Windows packaging tools (WiX)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install wixtoolset --version=3.14.1 -y --no-progress
+          $wix = Get-ChildItem "C:\Program Files (x86)\WiX Toolset*" -Directory | Select-Object -First 1
+          if (-not $wix) { throw "WiX Toolset not found after install" }
+          Add-Content -Path $env:GITHUB_PATH -Value "$($wix.FullName)\bin"
+          Write-Host "Added to PATH: $($wix.FullName)\bin"
+
       - name: Build and test
         # Override hardcoded java.home from pom.xml with CI JDK
+        # verify runs package → jlink + jpackage (.deb / .exe)
         run: mvn -B -P${{ matrix.maven_profile }} -Djava.home="$JAVA_HOME" clean verify
         shell: bash
 
@@ -42,10 +59,12 @@ jobs:
           path: target/sample-reports/expert-report.pdf
           if-no-files-found: ignore
 
-      - name: Upload packaged JAR
+      - name: Upload installer
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: jar-${{ matrix.os }}
-          path: target/*-jar-with-dependencies.jar
+          name: installer-${{ matrix.os }}
+          path: |
+            target/dist/*.deb
+            target/dist/*.exe
           if-no-files-found: ignore
