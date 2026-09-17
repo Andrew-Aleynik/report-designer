@@ -39,8 +39,8 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          choco install wixtoolset --version=3.14.1 -y --no-progress
           $wix = Get-ChildItem "C:\Program Files (x86)\WiX Toolset*" -Directory | Select-Object -First 1
+          if (-not $wix) { choco install wixtoolset --version=3.14.1 -y --no-progress }
           if (-not $wix) { throw "WiX Toolset not found after install" }
           Add-Content -Path $env:GITHUB_PATH -Value "$($wix.FullName)\bin"
           Write-Host "Added to PATH: $($wix.FullName)\bin"
