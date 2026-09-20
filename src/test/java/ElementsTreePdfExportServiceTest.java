@@ -8,7 +8,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -88,7 +87,7 @@ class ElementsTreePdfExportServiceTest {
 
         ElementQuality quality = new ElementQuality();
         quality.setCode("Q001");
-        quality.setServiceLife(Duration.ofDays(365));
+        quality.setServiceLife(new java.math.BigDecimal("365"));
         quality.setSatisfyingCost(new BigDecimal("100.00"));
         quality.setActualCost(new BigDecimal("95.00"));
 

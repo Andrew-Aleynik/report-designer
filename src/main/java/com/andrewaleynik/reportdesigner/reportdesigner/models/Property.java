@@ -26,6 +26,9 @@ public class Property {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "property_group_id", foreignKey = @ForeignKey(name = "fk_property_group_id"))
     private PropertyGroup propertyGroup;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "property_indicator_id", foreignKey = @ForeignKey(name = "fk_property_indicator_id"))
+    private PropertyIndicator propertyIndicator;
     private String qualityCriterionValue;
 
     public Long getId() {
@@ -54,6 +57,14 @@ public class Property {
 
     public void setPropertyGroup(PropertyGroup propertyGroup) {
         this.propertyGroup = propertyGroup;
+    }
+
+    public PropertyIndicator getPropertyIndicator() {
+        return propertyIndicator;
+    }
+
+    public void setPropertyIndicator(PropertyIndicator propertyIndicator) {
+        this.propertyIndicator = propertyIndicator;
     }
 
     public Set<ElementQuality> getQualities() {
@@ -111,6 +122,7 @@ public class Property {
                 .add("qualities=" + qualitiesString)
                 .add("unit=" + unit)
                 .add("propertyGroup=" + propertyGroup)
+                .add("propertyIndicator=" + propertyIndicator)
                 .add("qualityCriterionValue=" + qualityCriterionValue)
                 .toString();
     }

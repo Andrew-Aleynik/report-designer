@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -140,7 +139,7 @@ class H2Test extends BaseTest {
     void testElementQualityWithProperties() {
         ElementQuality quality = new ElementQuality();
         quality.setCode("HTPTS");
-        quality.setServiceLife(Duration.ofDays(3650));
+        quality.setServiceLife(new java.math.BigDecimal("3650"));
         quality.setSatisfyingCost(new BigDecimal("100000.00"));
         quality.setActualCost(new BigDecimal("95000.00"));
 
@@ -160,7 +159,7 @@ class H2Test extends BaseTest {
         assertThat(foundQualityOptional).isPresent();
         ElementQuality foundQuality = foundQualityOptional.get();
         assertThat(foundQuality.getProperties()).hasSize(1);
-        assertThat(foundQuality.getServiceLife().toDays()).isEqualTo(3650);
+        assertThat(foundQuality.getServiceLife()).isEqualByComparingTo("3650");
         assertThat(foundQuality.getSatisfyingCost()).isEqualByComparingTo("100000.00");
 
         Property foundProperty = foundQuality.getProperties().iterator().next();
@@ -328,7 +327,7 @@ class H2Test extends BaseTest {
     private ElementQuality createElementQuality() {
         ElementQuality quality = new ElementQuality();
         quality.setCode("HTPT");
-        quality.setServiceLife(Duration.ofDays(3650));
+        quality.setServiceLife(new java.math.BigDecimal("3650"));
         quality.setSatisfyingCost(new BigDecimal("75000.00"));
         quality.setActualCost(new BigDecimal("72000.00"));
         return quality;

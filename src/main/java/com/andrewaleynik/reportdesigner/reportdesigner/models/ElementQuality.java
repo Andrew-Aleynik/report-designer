@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,7 +28,7 @@ public class ElementQuality {
             inverseJoinColumns = @JoinColumn(name = "property_id")
     )
     private Set<Property> properties = new HashSet<>();
-    private Duration serviceLife;
+    private BigDecimal serviceLife;
     private BigDecimal satisfyingCost;
     private BigDecimal actualCost;
 
@@ -86,11 +85,11 @@ public class ElementQuality {
         toAdd.forEach(this::addProperty);
     }
 
-    public Duration getServiceLife() {
+    public BigDecimal getServiceLife() {
         return this.serviceLife;
     }
 
-    public void setServiceLife(Duration serviceLife) {
+    public void setServiceLife(BigDecimal serviceLife) {
         this.serviceLife = serviceLife;
     }
 

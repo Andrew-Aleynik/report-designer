@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +46,7 @@ class ElementServiceImplTest {
         elementType.setName("System");
 
         ElementQuality elementQuality = new ElementQuality();
-        elementQuality.setServiceLife(Duration.ofDays(3650L));
+        elementQuality.setServiceLife(new java.math.BigDecimal("3650"));
 
         rootElement = new Element();
         rootElement.setCode("ROOT001");

@@ -15,7 +15,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -40,11 +39,9 @@ public class ElementQualitiesTabController {
     @FXML
     private TableView<Property> propertiesTableView;
     @FXML
-    private Button saveButton;
-    @FXML
     private Button deleteButton;
 
-    private boolean isSaved = false;
+    private boolean suppressAutoSave;
 
     public ElementQualitiesTabController(ElementDataModel elementDataModel, QualityDataModel qualityDataModel,
                                          PropertyDataModel propertyDataModel) {
@@ -60,7 +57,6 @@ public class ElementQualitiesTabController {
         registerFormChangeListeners();
         elementDataModel.onChange(this::refreshLinkedElementDisplay);
         qualityDataModel.onChange(this::refreshLinkedElementDisplay);
-        updateSaveButtonState();
         updateDeleteButtonState();
     }
 
@@ -72,8 +68,12 @@ public class ElementQualitiesTabController {
                 qualityDataModel.setSelectedQuality(newVal);
                 propertyDataModel.setCurrentProperties(qualityDataModel.getSelectedQuality().getProperties());
                 populateFormWithQualityData();
+            } else {
+                qualityDataModel.setSelectedQuality(null);
+                propertyDataModel.setCurrentProperties(Collections.emptySet());
+                populateFormWithQualityData();
             }
-            markFormDirty();
+            updateDeleteButtonState();
         });
 
         elementQualitiesComboBox.setItems(qualityDataModel.getQualities());
@@ -83,65 +83,68 @@ public class ElementQualitiesTabController {
         TableColumn<Property, String> nameColumn = JavaFxControls.textColumn("Название", Property::getName);
         TableColumn<Property, String> groupColumn = JavaFxControls.textColumn("Группа",
                 property -> property.getPropertyGroup() != null ? property.getPropertyGroup().getName() : "");
+        TableColumn<Property, String> indicatorColumn = JavaFxControls.textColumn("Показатель",
+                property -> property.getPropertyIndicator() != null
+                        ? property.getPropertyIndicator().getName() : "");
         TableColumn<Property, String> unitColumn = JavaFxControls.textColumn("Единица измерения",
                 property -> property.getUnit() != null ? property.getUnit().getName() : "");
         TableColumn<Property, String> criterionValueColumn = JavaFxControls.textColumn(
-                "Критерий потребительского качества", Property::getQualityCriterionValue);
+                "Критерий качества", Property::getQualityCriterionValue);
         TableColumn<Property, Void> actionsColumn = JavaFxControls.actionsColumn(
                 this::handleEditProperty,
                 this::handleDeleteProperty
         );
 
-        nameColumn.setPrefWidth(180);
-        groupColumn.setPrefWidth(140);
-        unitColumn.setPrefWidth(120);
-        criterionValueColumn.setPrefWidth(150);
+        nameColumn.setPrefWidth(160);
+        groupColumn.setPrefWidth(120);
+        indicatorColumn.setPrefWidth(120);
+        unitColumn.setPrefWidth(110);
+        criterionValueColumn.setPrefWidth(130);
         actionsColumn.setPrefWidth(100);
 
         propertiesTableView.getColumns().setAll(
-                nameColumn, groupColumn, unitColumn, criterionValueColumn, actionsColumn);
+                nameColumn, groupColumn, indicatorColumn, unitColumn, criterionValueColumn, actionsColumn);
         JavaFxControls.configureConstrainedTable(propertiesTableView);
         propertiesTableView.setItems(propertyDataModel.getCurrentProperties());
     }
 
     private void registerFormChangeListeners() {
-        codeField.textProperty().addListener((obs, oldVal, newVal) -> markFormDirty());
-        serviceLifeDaysField.textProperty().addListener((obs, oldVal, newVal) -> markFormDirty());
-        satisfyingCostField.textProperty().addListener((obs, oldVal, newVal) -> markFormDirty());
-        actualCostField.textProperty().addListener((obs, oldVal, newVal) -> markFormDirty());
-    }
-
-    private void markFormDirty() {
-        isSaved = false;
-        updateSaveButtonState();
-        updateDeleteButtonState();
+        codeField.textProperty().addListener((obs, oldVal, newVal) -> autoSaveIfValid());
+        serviceLifeDaysField.textProperty().addListener((obs, oldVal, newVal) -> autoSaveIfValid());
+        satisfyingCostField.textProperty().addListener((obs, oldVal, newVal) -> autoSaveIfValid());
+        actualCostField.textProperty().addListener((obs, oldVal, newVal) -> autoSaveIfValid());
     }
 
     private void populateFormWithQualityData() {
-        ElementQuality quality = qualityDataModel.getSelectedQuality();
-        if (quality == null) {
-            elementNameField.setText("");
-            codeField.clear();
-            serviceLifeDaysField.clear();
-            satisfyingCostField.clear();
-            actualCostField.clear();
-            return;
-        }
+        suppressAutoSave = true;
+        try {
+            ElementQuality quality = qualityDataModel.getSelectedQuality();
+            if (quality == null) {
+                elementNameField.setText("");
+                codeField.clear();
+                serviceLifeDaysField.clear();
+                satisfyingCostField.clear();
+                actualCostField.clear();
+                return;
+            }
 
-        refreshLinkedElementDisplay();
-        codeField.setText(Optional.ofNullable(quality.getCode()).orElse(""));
-        serviceLifeDaysField.setText(
-                Optional.ofNullable(quality.getServiceLife())
-                        .map(duration -> Long.toString(duration.toDays()))
-                        .orElse(""));
-        satisfyingCostField.setText(
-                Optional.ofNullable(quality.getSatisfyingCost())
-                        .map(BigDecimal::toString)
-                        .orElse(""));
-        actualCostField.setText(
-                Optional.ofNullable(quality.getActualCost())
-                        .map(BigDecimal::toString)
-                        .orElse(""));
+            refreshLinkedElementDisplay();
+            codeField.setText(Optional.ofNullable(quality.getCode()).orElse(""));
+            serviceLifeDaysField.setText(
+                    Optional.ofNullable(quality.getServiceLife())
+                            .map(BigDecimal::toString)
+                            .orElse(""));
+            satisfyingCostField.setText(
+                    Optional.ofNullable(quality.getSatisfyingCost())
+                            .map(BigDecimal::toString)
+                            .orElse(""));
+            actualCostField.setText(
+                    Optional.ofNullable(quality.getActualCost())
+                            .map(BigDecimal::toString)
+                            .orElse(""));
+        } finally {
+            suppressAutoSave = false;
+        }
     }
 
     private void refreshLinkedElementDisplay() {
@@ -156,92 +159,93 @@ public class ElementQualitiesTabController {
                         .orElse(""));
     }
 
-    private void updateSaveButtonState() {
-        saveButton.setDisable(isFormInvalid() || isSaved);
-    }
-
     private void updateDeleteButtonState() {
-        deleteButton.setDisable(elementQualitiesComboBox.getValue() == null || !isSaved);
+        deleteButton.setDisable(elementQualitiesComboBox.getValue() == null);
     }
 
-    @FXML
-    public void handleCreateElementQuality() {
-        DialogOpener.<ElementQualityFormController>open(
-                App.FxmlPaths.ADD_ELEMENT_QUALITY_SHORT_FORM,
-                "Добавление потребительского качества",
-                elementQualitiesComboBox
-        ).ifPresent(result -> {
-            if (result.saved()) {
-                elementQualitiesComboBox.getSelectionModel().select(qualityDataModel.getNewQuality());
-                isSaved = true;
-                updateSaveButtonState();
-                updateDeleteButtonState();
-            }
-        });
+    private void autoSaveIfValid() {
+        if (suppressAutoSave || qualityDataModel.getSelectedQuality() == null || isFormInvalid()) {
+            return;
+        }
+        persistCurrentQuality();
     }
 
-    @FXML
-    public void handleUpdateQuality() {
-        if (isFormInvalid()) {
+    private void persistCurrentQuality() {
+        ElementQuality quality = qualityDataModel.getSelectedQuality();
+        if (quality == null) {
             return;
         }
 
-        ElementQuality quality = qualityDataModel.getSelectedQuality();
         quality.setCode(codeField.getText());
-        quality.setServiceLife(parseServiceLife(serviceLifeDaysField.getText()));
+        quality.setServiceLife(parseCost(serviceLifeDaysField.getText()));
         quality.setSatisfyingCost(parseCost(satisfyingCostField.getText()));
         quality.setActualCost(parseCost(actualCostField.getText()));
 
         qualityDataModel.updateQuality(quality);
         qualityDataModel.setSelectedQuality(quality);
         elementDataModel.refreshRootElements();
-        isSaved = true;
-        updateSaveButtonState();
         updateDeleteButtonState();
+    }
+
+    @FXML
+    public void handleCreateElementQuality() {
+        DialogOpener.<ElementQualityFormController>open(
+                App.FxmlPaths.ADD_ELEMENT_QUALITY_SHORT_FORM,
+                "Добавление элемента структурной модели",
+                elementQualitiesComboBox
+        ).ifPresent(result -> {
+            if (result.saved()) {
+                elementQualitiesComboBox.getSelectionModel().select(qualityDataModel.getNewQuality());
+                updateDeleteButtonState();
+            }
+        });
     }
 
     @FXML
     public void handleDeleteQuality() {
         qualityDataModel.deleteQuality(elementQualitiesComboBox.getValue());
         qualityDataModel.setSelectedQuality(null);
+        elementQualitiesComboBox.getSelectionModel().clearSelection();
         populateFormWithQualityData();
         propertyDataModel.setCurrentProperties(Collections.emptySet());
-        isSaved = true;
-        updateSaveButtonState();
         updateDeleteButtonState();
     }
 
     @FXML
     public void showAddPropertyForm() {
+        if (elementQualitiesComboBox.getValue() == null) {
+            return;
+        }
         qualityDataModel.setSelectedQuality(elementQualitiesComboBox.getValue());
         propertyDataModel.setEditingProperty(null);
 
         DialogOpener.open(
                 App.FxmlPaths.ADD_PROPERTY_FORM,
-                "Добавление потребительского свойства",
+                "Добавление свойства",
                 propertiesTableView
         );
 
-        markFormDirty();
         propertyDataModel.setCurrentProperties(qualityDataModel.getSelectedQuality().getProperties());
+        persistCurrentQuality();
     }
 
     @FXML
     public void showInheritPropertyForm() {
+        if (elementQualitiesComboBox.getValue() == null) {
+            return;
+        }
         qualityDataModel.setSelectedQuality(elementQualitiesComboBox.getValue());
         propertyDataModel.setEditingProperty(null);
 
         DialogOpener.<InheritPropertyFormController>open(
                 App.FxmlPaths.INHERIT_PROPERTY_FORM,
-                "Наследование потребительских свойств",
+                "Наследование свойств",
                 propertiesTableView
         ).ifPresent(result -> {
-            isSaved = !result.saved();
             if (result.saved()) {
                 propertyDataModel.setCurrentProperties(qualityDataModel.getSelectedQuality().getProperties());
+                persistCurrentQuality();
             }
-            updateSaveButtonState();
-            updateDeleteButtonState();
         });
     }
 
@@ -251,12 +255,12 @@ public class ElementQualitiesTabController {
 
         DialogOpener.open(
                 App.FxmlPaths.ADD_PROPERTY_FORM,
-                "Редактирование потребительского свойства",
+                "Редактирование свойства",
                 propertiesTableView
         );
 
-        markFormDirty();
         propertyDataModel.setCurrentProperties(qualityDataModel.getSelectedQuality().getProperties());
+        persistCurrentQuality();
     }
 
     private void handleDeleteProperty(Property property) {
@@ -269,27 +273,16 @@ public class ElementQualitiesTabController {
                 ElementQuality currentQuality = qualityDataModel.getSelectedQuality();
                 currentQuality.removeProperty(property);
                 propertyDataModel.setCurrentProperties(currentQuality.getProperties());
-                markFormDirty();
+                persistCurrentQuality();
             }
         });
     }
 
     private boolean isFormInvalid() {
         return FormValidators.isBlankOrTooShort(codeField.getText(), 3)
-                || !FormValidators.isOptionalNonNegativeLong(serviceLifeDaysField.getText())
+                || !FormValidators.isOptionalNonNegativeBigDecimal(serviceLifeDaysField.getText())
                 || !FormValidators.isOptionalNonNegativeBigDecimal(satisfyingCostField.getText())
                 || !FormValidators.isOptionalNonNegativeBigDecimal(actualCostField.getText());
-    }
-
-    private Duration parseServiceLife(String value) {
-        if (FormValidators.isBlank(value)) {
-            return null;
-        }
-        try {
-            return Duration.ofDays(Long.parseLong(value.trim()));
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
     private BigDecimal parseCost(String value) {

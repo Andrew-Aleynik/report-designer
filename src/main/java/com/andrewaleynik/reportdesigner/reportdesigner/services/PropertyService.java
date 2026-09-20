@@ -3,6 +3,7 @@ package com.andrewaleynik.reportdesigner.reportdesigner.services;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Property;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyGroup;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyIndicator;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyUnit;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public interface PropertyService {
     List<PropertyUnit> getPropertyUnits();
 
     List<PropertyGroup> getPropertyGroups();
+
+    List<PropertyIndicator> getPropertyIndicators();
 
     void saveProperty(Property property);
 
@@ -28,4 +31,6 @@ public interface PropertyService {
     void savePropertyUnit(PropertyUnit propertyUnit);
 
     void savePropertyGroup(PropertyGroup propertyGroup);
+
+    void savePropertyIndicator(PropertyIndicator propertyIndicator);
 }

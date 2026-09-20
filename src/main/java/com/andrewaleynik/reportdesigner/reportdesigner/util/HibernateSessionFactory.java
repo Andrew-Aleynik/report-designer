@@ -47,6 +47,7 @@ public class HibernateSessionFactory {
                 ExternalInfluenceLevel.class,
                 Property.class,
                 PropertyGroup.class,
+                PropertyIndicator.class,
                 PropertyUnit.class,
                 PropertyValue.class
         };

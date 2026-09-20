@@ -11,6 +11,10 @@ public final class PropertyDisplayFormatter {
         StringBuilder display = new StringBuilder();
         display.append(property.getName() != null ? property.getName() : "Без названия");
 
+        if (property.getPropertyIndicator() != null
+                && property.getPropertyIndicator().getName() != null) {
+            display.append("\nПоказатель: ").append(property.getPropertyIndicator().getName());
+        }
         if (property.getUnit() != null) {
             display.append("\nЕд.изм.: ").append(property.getUnit().getName());
         }

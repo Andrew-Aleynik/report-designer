@@ -98,7 +98,7 @@ public class ElementFormController extends AbstractDialogController {
     private void handleCreateQualityButton() {
         DialogOpener.<ElementQualityFormController>open(
                 App.FxmlPaths.ADD_ELEMENT_QUALITY_SHORT_FORM,
-                "Добавление потребительского качества",
+                "Добавление элемента структурной модели",
                 qualityComboBox
         ).ifPresent(result -> {
             if (result.saved()) {

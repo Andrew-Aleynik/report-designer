@@ -26,7 +26,7 @@
             <Tab text="Структурная модель объекта">
                 <fx:include source="ElementsTreeTab.fxml"/>
             </Tab>
-            <Tab text="Потребительские качества">
+            <Tab text="Оптимальное качество">
                 <fx:include source="QualitiesTab.fxml"/>
             </Tab>
             <Tab text="Внешние воздействия">

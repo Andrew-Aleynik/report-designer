@@ -1,10 +1,12 @@
 package com.andrewaleynik.reportdesigner.reportdesigner.services;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Element;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.pdf.ExpertPdfFooterHandler;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.pdf.ExpertReportTableBuilder;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.pdf.ExpertTableStyle;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.pdf.PdfFontLoader;
+import com.andrewaleynik.reportdesigner.reportdesigner.services.pdf.QualityCostsFormatter;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.geom.PageSize;
@@ -92,11 +94,21 @@ public class ElementsTreePdfExportService implements ExportService<TreeSet<Eleme
                 "Технические требования к типу детали «" + partTypeName + "» (" + objectName + ")",
                 boldFont));
         document.add(ExpertTableStyle.subtitleLine());
+        addQualityCosts(document, elementsTree.first().getQuality(), normalFont);
+        document.add(reportTableBuilder.buildRequirementsTable(elementsTree, normalFont, boldFont));
+    }
+
+    private void addQualityCosts(Document document, ElementQuality quality, PdfFont normalFont) {
+        for (String line : QualityCostsFormatter.formatLines(quality)) {
+            document.add(new Paragraph(line)
+                    .setFont(normalFont)
+                    .setFontSize(9)
+                    .setMarginBottom(2));
+        }
         document.add(new Paragraph(" ")
                 .setFont(normalFont)
-                .setFontSize(8)
+                .setFontSize(6)
                 .setMarginBottom(4));
-        document.add(reportTableBuilder.buildRequirementsTable(elementsTree, normalFont, boldFont));
     }
 
     private static String resolvePartTypeName(Element root) {

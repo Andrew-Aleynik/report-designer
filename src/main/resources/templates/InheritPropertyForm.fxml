@@ -7,10 +7,10 @@
       fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.InheritPropertyFormController"
       spacing="20" style="-fx-padding: 20;">
 
-    <Label text="Наследование потребительских свойств" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Наследование свойств" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
     <GridPane hgap="10" vgap="10">
-        <Label text="Наследование из свойств родительского потребительского качества: " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Label text="Наследование из свойств родительского оптимального качества: " GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <Label fx:id="parentQualityLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
         <Label text="Свойства:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>

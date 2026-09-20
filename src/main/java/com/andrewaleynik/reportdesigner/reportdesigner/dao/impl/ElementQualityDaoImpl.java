@@ -13,7 +13,7 @@ public class ElementQualityDaoImpl extends BaseDaoImpl<ElementQuality> implement
         super(ElementQuality.class);
     }
 
-    public List<ElementQuality> findByServiceLife(Long serviceLife) {
+    public List<ElementQuality> findByServiceLife(BigDecimal serviceLife) {
         return execute(s -> {
             Query<ElementQuality> query = s.createQuery(
                     "SELECT eq FROM ElementQuality eq WHERE eq.serviceLife = :serviceLife", ElementQuality.class);

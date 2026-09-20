@@ -68,7 +68,7 @@ public class InheritPropertyFormController extends AbstractDialogController {
         TableColumn<Property, String> unitColumn = JavaFxControls.textColumn("Единица измерения",
                 property -> property.getUnit() != null ? property.getUnit().getName() : "");
         TableColumn<Property, String> criterionValueColumn = JavaFxControls.textColumn(
-                "Критерий потребительского качества", Property::getQualityCriterionValue);
+                "Критерий качества", Property::getQualityCriterionValue);
         TableColumn<Property, Void> actionsColumn = createInheritActionsColumn();
 
         unitColumn.setPrefWidth(150);

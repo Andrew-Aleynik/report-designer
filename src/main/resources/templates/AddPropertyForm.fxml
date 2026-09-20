@@ -7,28 +7,35 @@
       fx:controller="com.andrewaleynik.reportdesigner.reportdesigner.controllers.PropertyFormController"
       spacing="20" style="-fx-padding: 20;">
 
-    <Label text="Добавление потребительского свойства" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Label text="Добавление свойства" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
     <GridPane hgap="10" vgap="10">
-        <Label text="Название:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <TextField fx:id="nameField" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="200"/>
-
-        <Label text="Критерий потребительского свойства:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <TextField fx:id="qualityCriterionValueField" GridPane.rowIndex="1" GridPane.columnIndex="1" prefWidth="200"/>
-
-        <Label text="Группа свойств:" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
-        <HBox spacing="5" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2">
+        <Label text="Группа свойств:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+        <HBox spacing="5" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2">
             <ComboBox fx:id="propertyGroupComboBox" prefWidth="175"/>
             <Button text="+" style="-fx-font-weight: bold;"
                     onAction="#handleCreatePropertyGroup"/>
         </HBox>
 
-        <Label text="Размерность:" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
-        <HBox spacing="5" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2">
+        <Label text="Название свойства:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="nameField" GridPane.rowIndex="2" GridPane.columnIndex="1" prefWidth="200"/>
+
+        <Label text="Показатель свойства:" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+        <HBox spacing="5" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="2">
+            <ComboBox fx:id="propertyIndicatorComboBox" prefWidth="175"/>
+            <Button text="+" style="-fx-font-weight: bold;"
+                    onAction="#handleCreatePropertyIndicator"/>
+        </HBox>
+
+        <Label text="Размерность:" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+        <HBox spacing="5" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="2">
             <ComboBox fx:id="unitComboBox" prefWidth="175"/>
             <Button text="+" style="-fx-font-weight: bold;"
                     onAction="#handleCreateUnit"/>
         </HBox>
+
+        <Label text="Критерий качества:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+        <TextField fx:id="qualityCriterionValueField" GridPane.rowIndex="7" GridPane.columnIndex="1" prefWidth="200"/>
     </GridPane>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">

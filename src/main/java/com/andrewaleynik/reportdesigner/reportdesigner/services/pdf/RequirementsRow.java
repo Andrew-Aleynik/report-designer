@@ -177,6 +177,11 @@ public final class RequirementsRow {
     }
 
     private static String formatIndicator(Property property) {
+        if (property.getPropertyIndicator() != null
+                && property.getPropertyIndicator().getName() != null
+                && !property.getPropertyIndicator().getName().isBlank()) {
+            return property.getPropertyIndicator().getName().trim();
+        }
         if (property.getUnit() != null && property.getUnit().getName() != null) {
             return property.getUnit().getName();
         }

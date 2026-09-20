@@ -29,7 +29,6 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.time.Duration;
 import java.util.TreeSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -119,7 +118,7 @@ class SampleReportExportTest extends BaseTest {
 
         ElementQuality quality = new ElementQuality();
         quality.setCode("HTPTS-DEMO");
-        quality.setServiceLife(Duration.ofDays(3650));
+        quality.setServiceLife(new java.math.BigDecimal("3650"));
         quality.setSatisfyingCost(new BigDecimal("125000.00"));
         quality.setActualCost(new BigDecimal("118500.00"));
         quality.addProperty(surfaceDefects);

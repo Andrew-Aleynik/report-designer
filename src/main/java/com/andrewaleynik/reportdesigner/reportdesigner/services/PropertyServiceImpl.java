@@ -2,10 +2,12 @@ package com.andrewaleynik.reportdesigner.reportdesigner.services;
 
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyGroupDao;
+import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyIndicatorDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.dao.PropertyUnitDao;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ElementQuality;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Property;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyGroup;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyIndicator;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyUnit;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -22,15 +24,18 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyDao propertyDao;
     private final PropertyUnitDao propertyUnitDao;
     private final PropertyGroupDao propertyGroupDao;
+    private final PropertyIndicatorDao propertyIndicatorDao;
 
     private final Validator validator;
 
     public PropertyServiceImpl(PropertyDao propertyDao,
                                PropertyUnitDao propertyUnitDao,
-                               PropertyGroupDao propertyGroupDao) {
+                               PropertyGroupDao propertyGroupDao,
+                               PropertyIndicatorDao propertyIndicatorDao) {
         this.propertyDao = propertyDao;
         this.propertyUnitDao = propertyUnitDao;
         this.propertyGroupDao = propertyGroupDao;
+        this.propertyIndicatorDao = propertyIndicatorDao;
         ValidatorFactory factory = Validation.byDefaultProvider()
                 .configure()
                 .messageInterpolator(new ParameterMessageInterpolator())
@@ -53,6 +58,11 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public List<PropertyGroup> getPropertyGroups() {
         return propertyGroupDao.findAll();
+    }
+
+    @Override
+    public List<PropertyIndicator> getPropertyIndicators() {
+        return propertyIndicatorDao.findAll();
     }
 
     @Override
@@ -94,5 +104,10 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public void savePropertyGroup(PropertyGroup propertyGroup) {
         propertyGroupDao.save(propertyGroup);
+    }
+
+    @Override
+    public void savePropertyIndicator(PropertyIndicator propertyIndicator) {
+        propertyIndicatorDao.save(propertyIndicator);
     }
 }

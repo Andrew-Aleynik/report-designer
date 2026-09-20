@@ -58,9 +58,21 @@ public class ElementQualityServiceImpl implements ElementQualityService {
             managed.setSatisfyingCost(detachedQuality.getSatisfyingCost());
             managed.setActualCost(detachedQuality.getActualCost());
 
-            detachedQuality.getProperties().stream()
-                    .map(p -> session.find(Property.class, p.getId()))
-                    .forEach(managed::addProperty);
+            Set<Long> desiredPropertyIds = detachedQuality.getProperties().stream()
+                    .map(Property::getId)
+                    .collect(Collectors.toSet());
+
+            managed.getProperties().stream()
+                    .filter(property -> !desiredPropertyIds.contains(property.getId()))
+                    .collect(Collectors.toSet())
+                    .forEach(managed::removeProperty);
+
+            for (Property property : detachedQuality.getProperties()) {
+                Property managedProperty = session.find(Property.class, property.getId());
+                if (managedProperty != null) {
+                    managed.addProperty(managedProperty);
+                }
+            }
 
             session.flush();
             tx.commit();

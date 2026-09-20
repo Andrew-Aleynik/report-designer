@@ -16,8 +16,10 @@ public class PropertyDataModel extends ObservableDataModel {
     private Property editingProperty;
     private final ObservableList<PropertyUnit> propertyUnits = FXCollections.observableArrayList();
     private final ObservableList<PropertyGroup> propertyGroups = FXCollections.observableArrayList();
+    private final ObservableList<PropertyIndicator> propertyIndicators = FXCollections.observableArrayList();
     private PropertyUnit newPropertyUnit;
     private PropertyGroup newPropertyGroup;
+    private PropertyIndicator newPropertyIndicator;
     private final ObservableList<Property> currentProperties = FXCollections.observableArrayList();
     private final Set<Property> inheritedProperties = new HashSet<>();
     private final ObservableList<Property> parentProperties = FXCollections.observableArrayList();
@@ -33,6 +35,7 @@ public class PropertyDataModel extends ObservableDataModel {
         this.propertyValueService = propertyValueService;
         refreshPropertyUnits();
         refreshPropertyGroups();
+        refreshPropertyIndicators();
     }
 
     public Property getEditingProperty() {
@@ -47,12 +50,20 @@ public class PropertyDataModel extends ObservableDataModel {
         return propertyGroups;
     }
 
+    public ObservableList<PropertyIndicator> getPropertyIndicators() {
+        return propertyIndicators;
+    }
+
     public PropertyUnit getNewPropertyUnit() {
         return newPropertyUnit;
     }
 
     public PropertyGroup getNewPropertyGroup() {
         return newPropertyGroup;
+    }
+
+    public PropertyIndicator getNewPropertyIndicator() {
+        return newPropertyIndicator;
     }
 
     public List<PropertyValue> getPropertyValuesOfQuality(ElementQuality quality) {
@@ -85,6 +96,11 @@ public class PropertyDataModel extends ObservableDataModel {
 
     public void refreshPropertyGroups() {
         propertyGroups.setAll(propertyService.getPropertyGroups());
+        fireChanged();
+    }
+
+    public void refreshPropertyIndicators() {
+        propertyIndicators.setAll(propertyService.getPropertyIndicators());
         fireChanged();
     }
 
@@ -159,6 +175,12 @@ public class PropertyDataModel extends ObservableDataModel {
         propertyService.savePropertyGroup(propertyGroup);
         newPropertyGroup = propertyGroup;
         refreshPropertyGroups();
+    }
+
+    public void savePropertyIndicator(PropertyIndicator propertyIndicator) {
+        propertyService.savePropertyIndicator(propertyIndicator);
+        newPropertyIndicator = propertyIndicator;
+        refreshPropertyIndicators();
     }
 
     public void addInheritedProperty(Property property) {

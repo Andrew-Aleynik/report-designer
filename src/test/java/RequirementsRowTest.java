@@ -2,6 +2,7 @@ import com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluence;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.ExternalInfluenceLevel;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.Property;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyGroup;
+import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyIndicator;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyUnit;
 import com.andrewaleynik.reportdesigner.reportdesigner.models.PropertyValue;
 import com.andrewaleynik.reportdesigner.reportdesigner.services.pdf.RequirementsRow;
@@ -103,5 +104,23 @@ class RequirementsRowTest {
         assertThat(rows.get(0).number()).isEqualTo("2.2");
         assertThat(rows.get(0).testRegime()).isEqualTo("давление 10МПа");
         assertThat(rowIndex.get()).isEqualTo(3);
+    }
+
+    @Test
+    void fromProperty_PrefersPropertyIndicatorOverUnit() {
+        Property property = new Property();
+        property.setName("Толщина");
+
+        PropertyIndicator indicator = new PropertyIndicator();
+        indicator.setName("Толщина покрытия");
+        property.setPropertyIndicator(indicator);
+
+        PropertyUnit unit = new PropertyUnit();
+        unit.setName("мкм");
+        property.setUnit(unit);
+
+        List<RequirementsRow> rows = RequirementsRow.fromProperty(1, property, Collections.emptyList());
+
+        assertThat(rows.get(0).propertyIndicator()).isEqualTo("Толщина покрытия");
     }
 }
