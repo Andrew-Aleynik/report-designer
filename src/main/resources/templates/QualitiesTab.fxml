@@ -40,8 +40,7 @@
         <!-- Свойства качества -->
         <VBox spacing="10">
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Свойства, удовлетворяющие все заинтересованные стороны"
-                       style="-fx-font-weight: bold;"/>
+                <Label text="Свойства элемента" style="-fx-font-weight: bold;"/>
                 <Button text="Добавить свойство" onAction="#showAddPropertyForm"/>
                 <Button text="Наследование" onAction="#showInheritPropertyForm"/>
             </HBox>
